@@ -576,7 +576,7 @@ footer{
   font-family:'Space Mono',monospace;font-size:11px;letter-spacing:1px;color:var(--acc2);
 }
 .host-chip-dot{width:8px;height:8px;border-radius:50%;background:var(--acc2);box-shadow:0 0 8px var(--acc2);}
-.pin-row{display:flex;gap:10px;align-items:stretch;margin-top:4px;}
+.pin-row{display:flex;flex-direction:column;gap:10px;margin-top:4px;}
 .pin-input{
   flex:1;height:54px;border-radius:12px;
   background:var(--sur);border:1px solid var(--bor);
@@ -588,10 +588,10 @@ footer{
 .pin-input:focus{border-color:var(--acc);}
 .pin-input::placeholder{color:var(--txt2);font-size:18px;letter-spacing:4px;font-weight:400;}
 .conn-btn{
-  flex:0 0 auto;padding:0 18px;border-radius:12px;
+  width:100%;padding:12px;border-radius:12px;
   background:var(--non-bg);border:1px solid var(--acc);color:var(--acc);
   font-family:'Space Mono',monospace;font-size:11px;letter-spacing:1.5px;
-  cursor:pointer;transition:all .2s;white-space:nowrap;
+  cursor:pointer;transition:all .2s;
 }
 .conn-btn:hover{filter:brightness(1.1);}
 .conn-btn:disabled{opacity:.4;cursor:not-allowed;}
