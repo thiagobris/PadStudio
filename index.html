@@ -162,7 +162,7 @@ input.cf::-webkit-slider-thumb{-webkit-appearance:none;width:17px;height:17px;bo
 @keyframes blink{0%{transform:scale(2.2);opacity:.3}100%{transform:scale(1);opacity:1}}
 .stxt{font-size:11px;font-family:'Space Mono',monospace;color:var(--txt2);white-space:nowrap;}
 .stimer{font-size:11px;font-family:'Space Mono',monospace;color:var(--acc);letter-spacing:1px;min-width:36px;text-align:right;white-space:nowrap;}
-.hpill-status{min-width:170px;justify-content:flex-start;gap:8px;}
+.hpill-status{justify-content:center;gap:8px;}
 
 /* icon btns */
 .hbtns{display:flex;gap:8px;flex-shrink:0;}
@@ -999,7 +999,7 @@ function startNote(name, o, el) {
 
   if (el) { el.classList.add('on'); el.dataset.k = k; }
   document.getElementById('niTom').textContent = name;
-  setSt(name + o);
+  setSt('PAD ' + name);
   startTimer();
 }
 
