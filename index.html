@@ -161,7 +161,8 @@ input.cf::-webkit-slider-thumb{-webkit-appearance:none;width:17px;height:17px;bo
 .sd.on{background:var(--acc);box-shadow:0 0 7px var(--acc);animation:blink .5s;}
 @keyframes blink{0%{transform:scale(2.2);opacity:.3}100%{transform:scale(1);opacity:1}}
 .stxt{font-size:11px;font-family:'Space Mono',monospace;color:var(--txt2);white-space:nowrap;}
-.hpill-status{width:148px;justify-content:center;}
+.stimer{font-size:11px;font-family:'Space Mono',monospace;color:var(--acc);letter-spacing:1px;min-width:36px;text-align:right;white-space:nowrap;}
+.hpill-status{min-width:170px;justify-content:flex-start;gap:8px;}
 
 /* icon btns */
 .hbtns{display:flex;gap:8px;flex-shrink:0;}
@@ -470,21 +471,22 @@ footer{
   .ld-count{font-size:12px;}
   .ld-top{gap:14px;}
 
-  /* Header: linha 1 = logo + status + botões | linha 2 = crossfade */
+  /* Header: linha 1 = logo + botões | linha 2 = status + crossfade */
   header{padding:12px 14px;gap:8px;}
   .logo{order:1;flex:1;font-size:14px;letter-spacing:2px;}
-  .hpill-status{order:2;width:auto;flex-shrink:0;padding:10px 14px;}
-  .hbtns{order:3;flex-shrink:0;gap:6px;}
-  .hctr{order:4;flex-basis:100%;flex:none;justify-content:stretch;}
-  .hctr .hpill{flex:1;padding:12px 16px;border-radius:13px;min-width:0;}
+  .hbtns{order:2;flex-shrink:0;gap:6px;}
+  .hctr{order:3;flex-basis:100%;flex:none;gap:8px;}
+  .hpill-status{min-width:0;flex-shrink:0;padding:10px 12px;}
+  .hctr .hpill:not(.hpill-status){flex:1;min-width:0;padding:12px 14px;border-radius:13px;}
+  .hl{display:none;}
   input.cf{flex:1;min-width:0;width:auto;height:6px;}
   input.cf::-webkit-slider-thumb{width:24px;height:24px;}
-  .hl{font-size:11px;letter-spacing:0.8px;}
   .hv{font-size:13px;min-width:26px;}
-  .stxt{font-size:12px;}
-  .sd{width:10px;height:10px;}
-  .hb{width:50px;height:50px;border-radius:13px;}
-  .hb svg{width:22px;height:22px;}
+  .stxt{font-size:11px;}
+  .stimer{font-size:11px;min-width:32px;}
+  .sd{width:9px;height:9px;}
+  .hb{width:48px;height:48px;border-radius:12px;}
+  .hb svg{width:21px;height:21px;}
 
   /* Conteúdo */
   main{padding:16px 14px;gap:20px;}
@@ -567,20 +569,19 @@ footer{
 <header>
   <div class="logo">PAD<b>STUDIO</b></div>
 
-  <!-- CROSSFADE — centrado no desktop, linha própria no mobile -->
+  <!-- hctr: status + crossfade centrados no desktop, linha 2 no mobile -->
   <div class="hctr">
+    <div class="hpill hpill-status">
+      <div class="sd" id="sd"></div>
+      <span class="stxt" id="stxt">PARADO</span>
+      <span class="stimer" id="stimer"></span>
+    </div>
     <div class="hpill">
       <span class="hl">CROSSFADE</span>
       <input class="cf" id="cfsl" type="range" min="0" max="10" step="1" value="0"
              oninput="cf=+this.value;document.getElementById('cfv').textContent=this.value+'s';autoSave()">
       <span class="hv" id="cfv">0s</span>
     </div>
-  </div>
-
-  <!-- STATUS — linha 1 no mobile, ao lado do crossfade no desktop -->
-  <div class="hpill hpill-status">
-    <div class="sd" id="sd"></div>
-    <span class="stxt" id="stxt">PARADO</span>
   </div>
 
   <div class="hbtns">
@@ -925,6 +926,24 @@ function initCtx() {
   });
 }
 
+// ── TIMER ──
+let timerInterval = null, timerSec = 0;
+function startTimer() {
+  clearInterval(timerInterval);
+  timerSec = 0;
+  renderTimer();
+  timerInterval = setInterval(() => { timerSec++; renderTimer(); }, 1000);
+}
+function stopTimer() {
+  clearInterval(timerInterval); timerInterval = null; timerSec = 0;
+  const el = document.getElementById('stimer'); if (el) el.textContent = '';
+}
+function renderTimer() {
+  const el = document.getElementById('stimer'); if (!el) return;
+  const m = Math.floor(timerSec / 60), s = timerSec % 60;
+  el.textContent = m + ':' + String(s).padStart(2, '0');
+}
+
 // ── NOTAS ──
 const NOTES = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
 const activeN = {};          // { k: { src?, osc1?, osc2?, g } }
@@ -981,6 +1000,7 @@ function startNote(name, o, el) {
   if (el) { el.classList.add('on'); el.dataset.k = k; }
   document.getElementById('niTom').textContent = name;
   setSt(name + o);
+  startTimer();
 }
 
 function stopNote(k, el) {
@@ -998,6 +1018,7 @@ function stopNote(k, el) {
   if (!Object.keys(activeN).length) {
     setSt('PARADO', false);
     document.getElementById('niTom').textContent = '—';
+    stopTimer();
   }
 }
 
