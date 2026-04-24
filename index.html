@@ -849,8 +849,13 @@ let noteMV = 0.8, drumMV = 0.8;
 const drumGains = [];
 
 function initCtx() {
-  if (ctx) return;
+  if (ctx) {
+    // iOS suspende o contexto após inatividade — retoma sempre que houver interação
+    if (ctx.state !== 'running') ctx.resume();
+    return;
+  }
   ctx = new (window.AudioContext || window.webkitAudioContext)();
+  ctx.resume(); // iOS: contexto começa suspenso, precisa ser retomado explicitamente
 
   masterG     = ctx.createGain();         masterG.gain.value     = 0.8;
   noteMasterG = ctx.createGain();         noteMasterG.gain.value = noteMV;
@@ -1181,6 +1186,11 @@ function setTheme(n) {
   document.getElementById('t-'+n).classList.add('a');
   autoSave();
 }
+
+// iOS: retoma AudioContext em qualquer toque na tela
+document.addEventListener('touchstart', () => {
+  if (ctx && ctx.state !== 'running') ctx.resume();
+}, { passive: true });
 
 const km={a:'C',w:'C#',s:'D',e:'D#',d:'E',f:'F',t:'F#',g:'G',y:'G#',h:'A',u:'A#',j:'B'};
 document.addEventListener('keydown', ev => {
