@@ -119,7 +119,7 @@
 /* ─── RESET ─── */
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{overflow-x:hidden;max-width:100%;overscroll-behavior-x:none;}
-body{background:var(--bg);color:var(--txt);font-family:'Syne',sans-serif;min-height:100vh;display:flex;flex-direction:column;transition:background .4s,color .4s;}
+body{background:var(--bg);color:var(--txt);font-family:'Syne',sans-serif;min-height:100vh;display:flex;flex-direction:column;transition:background .4s,color .4s;width:100%;max-width:100vw;overflow-x:clip;overscroll-behavior-x:none;}
 /* Wrapper: fix real para overflow horizontal no iOS Safari */
 #app{width:100%;overflow-x:hidden;display:flex;flex-direction:column;min-height:100vh;}
 
@@ -192,7 +192,7 @@ main{
 }
 
 /* ─── LEFT: NOTES ─── */
-.lcol{display:flex;flex-direction:column;gap:16px;height:100%;}
+.lcol{display:flex;flex-direction:column;gap:16px;height:100%;min-width:0;}
 
 .ngrid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;}
 
@@ -265,7 +265,7 @@ input.cs::-webkit-slider-thumb:hover{transform:scale(1.12);}
 input.cs::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:var(--acc);cursor:pointer;border:3px solid var(--bg);}
 
 /* ─── RIGHT: DRUMS ─── */
-.rcol{display:flex;flex-direction:column;gap:16px;}
+.rcol{display:flex;flex-direction:column;gap:16px;min-width:0;}
 
 .dgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
 
@@ -467,7 +467,7 @@ footer{
   .hb svg{width:16px;height:16px;}
 
   /* Linha 2 header */
-  .hctr{order:3;flex-basis:100%;flex:none;gap:6px;min-width:0;}
+  .hctr{order:3;flex-basis:100%;flex:none;gap:6px;min-width:0;justify-content:flex-start;}
   .hpill-status{width:auto;flex:1;min-width:0;padding:7px 10px;gap:5px;}
   .sd{width:7px;height:7px;flex-shrink:0;}
   .stxt{font-size:10px;white-space:nowrap;}
@@ -479,7 +479,7 @@ footer{
   .hv{font-size:10px;min-width:18px;flex-shrink:0;}
 
   /* ── Main ── */
-  main{padding:12px 24px;gap:12px;}
+  main{padding:12px 24px;gap:12px;width:100%;box-sizing:border-box;}
   .lcol{gap:10px;}
   .rcol{gap:10px;}
 
@@ -535,7 +535,7 @@ footer{
 /* ── iPhone SE ≤375px ── */
 @media(max-width:375px){
   header{padding:7px 24px;}
-  main{padding:10px 24px;gap:10px;}
+  main{padding:10px 24px;gap:10px;width:100%;box-sizing:border-box;}
   .hb{width:34px;height:34px;}
   .npad{height:64px;font-size:14px;}
   .dpad{height:90px;}
