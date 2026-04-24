@@ -418,6 +418,29 @@ input.cs::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:v
 .tc-name{font-size:13px;font-weight:800;letter-spacing:.4px;}
 .tc-desc{font-size:9px;color:var(--txt2);margin-top:3px;letter-spacing:.4px;}
 
+/* ─── LOADER ─── */
+#loader{
+  position:fixed;inset:0;z-index:600;
+  background:var(--bg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
+  transition:opacity .6s;
+}
+#loader.fade{opacity:0;pointer-events:none;}
+.ld-logo{font-family:'Space Mono',monospace;font-size:26px;font-weight:700;letter-spacing:4px;color:var(--acc);}
+.ld-logo b{color:var(--txt);}
+.ld-kit{font-family:'Space Mono',monospace;font-size:10px;color:var(--txt2);letter-spacing:2px;margin-bottom:6px;}
+.ld-btn{
+  padding:13px 36px;border-radius:14px;
+  background:var(--non-bg);border:1px solid var(--acc);
+  color:var(--acc);font-family:'Space Mono',monospace;font-size:12px;letter-spacing:2px;
+  cursor:pointer;transition:filter .2s;margin-top:8px;
+}
+.ld-btn:hover{filter:brightness(1.15);}
+.ld-prog{display:none;flex-direction:column;align-items:center;gap:10px;margin-top:8px;width:220px;}
+.ld-bar-bg{width:100%;height:4px;background:var(--slbg);border-radius:2px;overflow:hidden;}
+.ld-bar-fill{height:100%;width:0%;background:var(--acc);border-radius:2px;transition:width .25s;}
+.ld-count{font-family:'Space Mono',monospace;font-size:10px;color:var(--txt2);letter-spacing:1.5px;}
+
 /* ─── RESPONSIVE ─── */
 @media(max-width:720px){
   main{grid-template-columns:1fr;padding:20px 16px;}
@@ -429,6 +452,17 @@ input.cs::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:v
 </style>
 </head>
 <body>
+
+<!-- LOADER -->
+<div id="loader">
+  <div class="ld-logo">PAD<b>STUDIO</b></div>
+  <div class="ld-kit">Pad · Prayer Vol. 3</div>
+  <button class="ld-btn" id="ldBtn" onclick="startApp()">▶ &nbsp;TOQUE PARA COMEÇAR</button>
+  <div class="ld-prog" id="ldProg">
+    <div class="ld-bar-bg"><div class="ld-bar-fill" id="ldFill"></div></div>
+    <div class="ld-count" id="ldCount">0 / 12</div>
+  </div>
+</div>
 
 <!-- HEADER -->
 <header>
@@ -885,12 +919,7 @@ const NOTE_FILES = {};
 
 async function loadSavedAudios() {
   await openDB();
-
-  // marca todos como "carregando"
-  NOTES.forEach(n => {
-    const el = document.querySelector(`.npad[data-note="${n}"]`);
-    if (el) el.classList.add('loading');
-  });
+  let count = 0;
 
   for (const name of NOTES) {
     const padEl = document.querySelector(`.npad[data-note="${name}"]`);
@@ -903,23 +932,19 @@ async function loadSavedAudios() {
       try {
         const res = await fetch(NOTE_FILES[name]);
         if (res.ok) raw = await res.arrayBuffer();
-        if (raw) await dbSet('note_' + name, raw); // salva no cache
+        if (raw) await dbSet('note_' + name, raw);
       } catch(e) {}
     }
 
-    if (!raw) {
-      if (padEl) padEl.classList.remove('loading');
-      continue;
+    if (raw) {
+      try {
+        const audioBuf = await ctx.decodeAudioData(raw.slice(0));
+        noteBuffers[name] = audioBuf;
+        if (padEl) padEl.classList.add('loaded');
+      } catch(e) {}
     }
 
-    try {
-      initCtx();
-      const audioBuf = await ctx.decodeAudioData(raw.slice ? raw.slice(0) : raw.slice(0));
-      noteBuffers[name] = audioBuf;
-      if (padEl) { padEl.classList.remove('loading'); padEl.classList.add('loaded'); }
-    } catch(e) {
-      if (padEl) padEl.classList.remove('loading');
-    }
+    loaderProgress(++count);
   }
 }
 
@@ -1090,13 +1115,36 @@ document.addEventListener('keydown', ev => {
 });
 
 // ══════════════════════════════════════
+// LOADER
+// ══════════════════════════════════════
+function startApp() {
+  initCtx();
+  document.getElementById('ldBtn').style.display = 'none';
+  const prog = document.getElementById('ldProg');
+  prog.style.display = 'flex';
+  loadSavedAudios();
+}
+
+function loaderProgress(n) {
+  const total = NOTES.length;
+  document.getElementById('ldFill').style.width = (n / total * 100) + '%';
+  document.getElementById('ldCount').textContent = n < total ? n + ' / ' + total : 'PRONTO!';
+  if (n >= total) {
+    setTimeout(() => {
+      const ld = document.getElementById('loader');
+      ld.classList.add('fade');
+      setTimeout(() => ld.remove(), 650);
+    }, 350);
+  }
+}
+
+// ══════════════════════════════════════
 // INIT
 // ══════════════════════════════════════
 buildNotes();
 buildDrums();
 buildBeats();
 loadSettings();
-loadSavedAudios();
 </script>
 <div class="toast" id="toast"></div>
 </body>
