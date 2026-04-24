@@ -917,17 +917,15 @@ const NOTE_FILES = {};
   NOTE_FILES[n] = 'audio/' + n.replace('#','%23') + '.m4a';
 });
 
-async function loadSavedAudios() {
+// ArrayBuffers baixados em background (antes do clique)
+const prefetched = {};
+let prefetchPromise;
+
+async function prefetchAudios() {
   await openDB();
-  let count = 0;
-
-  for (const name of NOTES) {
-    const padEl = document.querySelector(`.npad[data-note="${name}"]`);
-
-    // 1º tenta cache do IndexedDB
+  // Baixa todos os 12 arquivos em paralelo, silenciosamente
+  await Promise.all(NOTES.map(async name => {
     let raw = await dbGet('note_' + name);
-
-    // 2º se não tem cache, carrega do arquivo
     if (!raw && NOTE_FILES[name]) {
       try {
         const res = await fetch(NOTE_FILES[name]);
@@ -935,6 +933,18 @@ async function loadSavedAudios() {
         if (raw) await dbSet('note_' + name, raw);
       } catch(e) {}
     }
+    if (raw) prefetched[name] = raw;
+  }));
+}
+
+async function loadSavedAudios() {
+  // Aguarda o pré-carregamento (provavelmente já terminou)
+  await prefetchPromise;
+  let count = 0;
+
+  for (const name of NOTES) {
+    const padEl = document.querySelector(`.npad[data-note="${name}"]`);
+    const raw = prefetched[name];
 
     if (raw) {
       try {
@@ -1145,6 +1155,7 @@ buildNotes();
 buildDrums();
 buildBeats();
 loadSettings();
+prefetchPromise = prefetchAudios(); // começa baixar em silêncio imediatamente
 </script>
 <div class="toast" id="toast"></div>
 </body>
