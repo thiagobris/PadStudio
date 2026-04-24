@@ -133,7 +133,7 @@ header{
 .logo{font-family:'Space Mono',monospace;font-size:16px;font-weight:700;letter-spacing:3px;color:var(--acc);flex-shrink:0;}
 .logo b{color:var(--txt);}
 
-.hpill-cf{flex:1;max-width:320px;}
+.hctr{display:flex;align-items:center;gap:12px;flex:1;justify-content:center;flex-wrap:wrap;}
 
 /* unified pill style */
 .hpill{
@@ -463,19 +463,19 @@ footer{
 @media(max-width:600px){
   html,body{overflow-x:hidden;}
 
-  /* ── Header: linha 1 = logo + status + botões | linha 2 = crossfade ── */
+  /* ── Header: linha 1 = logo + status + botões | linha 2 = crossfade (hctr) ── */
   header{padding:12px 16px;gap:8px;}
   .logo{order:1;flex:1;font-size:14px;letter-spacing:2px;}
   .hpill-status{order:2;width:auto;flex-shrink:0;padding:9px 12px;}
   .hbtns{order:3;flex-shrink:0;gap:6px;}
-  .hpill-cf{order:4;flex-basis:100%;max-width:100%;padding:11px 16px;border-radius:13px;}
-  .hpill{padding:9px 12px;}
+  .hctr{order:4;flex-basis:100%;flex:none;justify-content:stretch;}
+  .hctr .hpill{flex:1;padding:11px 16px;border-radius:13px;min-width:0;}
+  input.cf{flex:1;min-width:0;width:auto;height:6px;}
+  input.cf::-webkit-slider-thumb{width:22px;height:22px;}
   .hl{font-size:10px;letter-spacing:0.8px;}
   .hv{font-size:12px;min-width:24px;}
   .stxt{font-size:11px;}
   .sd{width:9px;height:9px;}
-  input.cf{flex:1;min-width:0;width:auto;height:6px;}
-  input.cf::-webkit-slider-thumb{width:22px;height:22px;}
   .hb{width:48px;height:48px;border-radius:12px;}
   .hb svg{width:22px;height:22px;}
 
@@ -498,7 +498,7 @@ footer{
   .nmvol{padding:16px 18px;border-radius:14px;}
   .vol-lbl{font-size:11px;letter-spacing:1px;margin-bottom:12px;}
 
-  /* ── Drum pads: 2 colunas, mais largos ── */
+  /* ── Drum pads: 2 colunas, maiores ── */
   .dgrid{grid-template-columns:repeat(2,1fr);gap:10px;}
   .dpad{height:110px;padding:14px 16px;border-radius:14px;touch-action:manipulation;}
   .dpad-name{font-size:15px;}
@@ -539,8 +539,7 @@ footer{
 <!-- LOADER -->
 <div id="loader">
   <div class="ld-logo">PAD<b>STUDIO</b></div>
-  <button class="ld-btn" id="ldBtn" onclick="startApp()">▶ &nbsp;TOQUE PARA COMEÇAR</button>
-  <div class="ld-prog" id="ldProg">
+  <div class="ld-prog" id="ldProg" style="display:flex">
     <div class="ld-bar-bg"><div class="ld-bar-fill" id="ldFill"></div></div>
     <div class="ld-count" id="ldCount">Carregando os Pads...</div>
   </div>
@@ -550,7 +549,17 @@ footer{
 <header>
   <div class="logo">PAD<b>STUDIO</b></div>
 
-  <!-- STATUS — linha 1 junto ao logo -->
+  <!-- CROSSFADE — centrado no desktop, linha própria no mobile -->
+  <div class="hctr">
+    <div class="hpill">
+      <span class="hl">CROSSFADE</span>
+      <input class="cf" id="cfsl" type="range" min="0" max="10" step="1" value="0"
+             oninput="cf=+this.value;document.getElementById('cfv').textContent=this.value+'s';autoSave()">
+      <span class="hv" id="cfv">0s</span>
+    </div>
+  </div>
+
+  <!-- STATUS — linha 1 no mobile, ao lado do crossfade no desktop -->
   <div class="hpill hpill-status">
     <div class="sd" id="sd"></div>
     <span class="stxt" id="stxt">PARADO</span>
@@ -577,14 +586,6 @@ footer{
         <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.7"/>
       </svg>
     </div>
-  </div>
-
-  <!-- CROSSFADE — linha própria no mobile, inline no desktop -->
-  <div class="hpill hpill-cf">
-    <span class="hl">CROSSFADE</span>
-    <input class="cf" id="cfsl" type="range" min="0" max="10" step="1" value="0"
-           oninput="cf=+this.value;document.getElementById('cfv').textContent=this.value+'s';autoSave()">
-    <span class="hv" id="cfv">0s</span>
   </div>
 </header>
 
@@ -1027,14 +1028,12 @@ async function prefetchAudios() {
 }
 
 async function loadSavedAudios() {
-  // Aguarda o pré-carregamento (provavelmente já terminou)
   await prefetchPromise;
   let count = 0;
-
-  for (const name of NOTES) {
+  // Decodifica todos os 12 arquivos em paralelo (muito mais rápido)
+  await Promise.all(NOTES.map(async name => {
     const padEl = document.querySelector(`.npad[data-note="${name}"]`);
     const raw = prefetched[name];
-
     if (raw) {
       try {
         const audioBuf = await ctx.decodeAudioData(raw.slice(0));
@@ -1042,9 +1041,8 @@ async function loadSavedAudios() {
         if (padEl) padEl.classList.add('loaded');
       } catch(e) {}
     }
-
     loaderProgress(++count);
-  }
+  }));
 }
 
 // ── DRUMS ──
@@ -1221,13 +1219,16 @@ document.addEventListener('keydown', ev => {
 // ══════════════════════════════════════
 // LOADER
 // ══════════════════════════════════════
-function startApp() {
-  initCtx();
-  document.getElementById('ldBtn').style.display = 'none';
-  const prog = document.getElementById('ldProg');
-  prog.style.display = 'flex';
+async function startLoading() {
+  try { initCtx(); } catch(e) {}
   loadSavedAudios();
 }
+
+// Fallback para iOS antigo: toque na tela inicia se ainda não iniciou
+let loadingStarted = false;
+document.addEventListener('touchstart', () => {
+  if (!loadingStarted) { loadingStarted = true; startLoading(); }
+}, { once: true, passive: true });
 
 function loaderProgress(n) {
   const total = NOTES.length;
@@ -1249,7 +1250,10 @@ buildNotes();
 buildDrums();
 buildBeats();
 loadSettings();
-prefetchPromise = prefetchAudios(); // começa baixar em silêncio imediatamente
+prefetchPromise = prefetchAudios();
+// Auto-start: decodifica assim que os arquivos estiverem prontos (sem esperar clique)
+loadingStarted = true;
+startLoading();
 </script>
 <div class="toast" id="toast"></div>
 </body>
