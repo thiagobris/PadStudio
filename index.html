@@ -1538,8 +1538,16 @@ function connectAsRemote(code) {
         document.getElementById('niTom').textContent = ev.niTom;
         document.getElementById('stxt').textContent = ev.st;
         const d = document.getElementById('sd');
-        if (ev.run) { d.classList.add('on'); startTimer(); }
-        else { d.classList.remove('on'); stopTimer(); }
+        document.querySelectorAll('.npad').forEach(p => p.classList.remove('on'));
+        if (ev.run) {
+          d.classList.add('on');
+          startTimer();
+          const pad = document.querySelector('.npad[data-note="' + ev.niTom + '"]');
+          if (pad) pad.classList.add('on');
+        } else {
+          d.classList.remove('on');
+          stopTimer();
+        }
       }
     });
     conn.on('close', () => {
