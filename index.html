@@ -154,7 +154,7 @@ header{
 /* crossfade slider */
 input.cf{
   -webkit-appearance:none;appearance:none;
-  width:90px;height:4px;border-radius:2px;
+  flex:1;width:0;min-width:0;height:4px;border-radius:2px;
   background:var(--slbg);outline:none;cursor:pointer;
 }
 input.cf::-webkit-slider-thumb{-webkit-appearance:none;width:17px;height:17px;border-radius:50%;background:var(--acc);cursor:pointer;box-shadow:var(--thumb-sh);}
@@ -472,11 +472,8 @@ footer{
   .sd{width:7px;height:7px;flex-shrink:0;}
   .stxt{font-size:10px;white-space:nowrap;}
   .stimer{font-size:10px;min-width:26px;flex-shrink:0;}
-  .hctr .hpill:not(.hpill-status){flex:1;min-width:0;padding:7px 10px;border-radius:10px;gap:5px;}
-  .hl{display:none;}
-  input.cf{flex:1;width:0;min-width:0;height:4px;}
-  input.cf::-webkit-slider-thumb{width:18px;height:18px;}
-  .hv{font-size:10px;min-width:18px;flex-shrink:0;}
+  input.cf::-webkit-slider-thumb{width:22px;height:22px;}
+  .vpct{font-size:10px;}
 
   /* ── Main ── */
   main{padding:12px 24px;gap:12px;width:100%;box-sizing:border-box;}
@@ -611,18 +608,12 @@ footer{
 <header>
   <div class="logo">PAD<b>STUDIO</b></div>
 
-  <!-- hctr: status + crossfade centrados no desktop, linha 2 no mobile -->
+  <!-- status sozinho no header -->
   <div class="hctr">
     <div class="hpill hpill-status">
       <div class="sd" id="sd"></div>
       <span class="stxt" id="stxt">PARADO</span>
       <span class="stimer" id="stimer"></span>
-    </div>
-    <div class="hpill">
-      <span class="hl">CROSSFADE</span>
-      <input class="cf" id="cfsl" type="range" min="0" max="10" step="1" value="0"
-             oninput="cf=+this.value;document.getElementById('cfv').textContent=this.value+'s';sendRemote({type:'param',k:'cf',v:cf});autoSave()">
-      <span class="hv" id="cfv">0s</span>
     </div>
   </div>
 
@@ -683,6 +674,12 @@ footer{
         <input class="cs" id="noteMasterSl" type="range" min="0" max="100" value="50" style="--p:50%"
                oninput="sp(this);noteMV=this.value/100;if(noteMasterG)noteMasterG.gain.value=noteMV;document.getElementById('nmpct').textContent=this.value+'%';sendRemote({type:'param',k:'noteMV',v:noteMV});autoSave()">
         <span class="vpct" id="nmpct">50%</span>
+      </div>
+      <div class="vol-lbl" style="margin-top:12px;margin-bottom:6px">CROSSFADE</div>
+      <div class="vrow">
+        <input class="cf" id="cfsl" type="range" min="0" max="10" step="1" value="0"
+               oninput="cf=+this.value;document.getElementById('cfv').textContent=this.value+'s';sendRemote({type:'param',k:'cf',v:cf});autoSave()">
+        <span class="vpct" id="cfv">0s</span>
       </div>
     </div>
   </div>
