@@ -1058,7 +1058,7 @@ let prefetchPromise;
 
 async function prefetchAudios() {
   await openDB();
-  // Baixa todos os 12 arquivos em paralelo, silenciosamente
+  let done = 0;
   await Promise.all(NOTES.map(async name => {
     let raw = await dbGet('note_' + name);
     if (!raw && NOTE_FILES[name]) {
@@ -1069,25 +1069,23 @@ async function prefetchAudios() {
       } catch(e) {}
     }
     if (raw) prefetched[name] = raw;
+    done++;
+    const fill = document.getElementById('ldFill');
+    if (fill) fill.style.width = (done / NOTES.length * 100) + '%';
   }));
 }
 
-async function loadSavedAudios() {
-  await prefetchPromise;
-  let count = 0;
-  // Decodifica todos os 12 arquivos em paralelo (muito mais rápido)
-  await Promise.all(NOTES.map(async name => {
-    const padEl = document.querySelector(`.npad[data-note="${name}"]`);
+async function decodeAudiosInBackground() {
+  NOTES.forEach(async name => {
     const raw = prefetched[name];
-    if (raw) {
-      try {
-        const audioBuf = await ctx.decodeAudioData(raw.slice(0));
-        noteBuffers[name] = audioBuf;
-        if (padEl) padEl.classList.add('loaded');
-      } catch(e) {}
-    }
-    loaderProgress(++count);
-  }));
+    if (!raw) return;
+    try {
+      const buf = await ctx.decodeAudioData(raw.slice(0));
+      noteBuffers[name] = buf;
+      const el = document.querySelector(`.npad[data-note="${name}"]`);
+      if (el) el.classList.add('loaded');
+    } catch(e) {}
+  });
 }
 
 // ── DRUMS ──
@@ -1264,29 +1262,30 @@ document.addEventListener('keydown', ev => {
 // ══════════════════════════════════════
 // LOADER
 // ══════════════════════════════════════
-async function startLoading() {
-  try { initCtx(); } catch(e) {}
-  loadSavedAudios();
+function dismissLoader() {
+  const ld = document.getElementById('loader');
+  if (!ld) return;
+  const fill = document.getElementById('ldFill');
+  const count = document.getElementById('ldCount');
+  if (fill) fill.style.width = '100%';
+  if (count) count.textContent = 'PRONTO!';
+  setTimeout(() => { ld.classList.add('fade'); setTimeout(() => ld.remove(), 650); }, 300);
 }
 
-// Fallback para iOS antigo: toque na tela inicia se ainda não iniciou
+async function startLoading() {
+  try { initCtx(); } catch(e) {}
+  // Aguarda apenas o download/leitura do IndexedDB (rápido no reload)
+  await prefetchPromise;
+  // Mostra o site imediatamente
+  dismissLoader();
+  // Decodifica em background — pads funcionam com oscilador até ficarem prontos
+  decodeAudiosInBackground();
+}
+
 let loadingStarted = false;
 document.addEventListener('touchstart', () => {
   if (!loadingStarted) { loadingStarted = true; startLoading(); }
 }, { once: true, passive: true });
-
-function loaderProgress(n) {
-  const total = NOTES.length;
-  document.getElementById('ldFill').style.width = (n / total * 100) + '%';
-  document.getElementById('ldCount').textContent = n < total ? 'Carregando os Pads...' : 'PRONTO!';
-  if (n >= total) {
-    setTimeout(() => {
-      const ld = document.getElementById('loader');
-      ld.classList.add('fade');
-      setTimeout(() => ld.remove(), 650);
-    }, 350);
-  }
-}
 
 // ══════════════════════════════════════
 // INIT
