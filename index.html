@@ -877,15 +877,11 @@ async function loadAudioFile(name, file, padEl) {
 }
 
 // Mapa de nota → arquivo de áudio
-const NOTE_FILES = {
-  'C':'audio/C.m4a','C#':'audio/Cs.m4a',
-  'D':'audio/D.m4a','D#':'audio/Ds.m4a',
-  'E':'audio/E.m4a',
-  'F':'audio/F.m4a','F#':'audio/Fs.m4a',
-  'G':'audio/G.m4a','G#':'audio/Gs.m4a',
-  'A':'audio/A.m4a','A#':'audio/As.m4a',
-  'B':'audio/B.m4a'
-};
+// # em URLs precisa ser %23 para não ser confundido com âncora
+const NOTE_FILES = {};
+['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'].forEach(n => {
+  NOTE_FILES[n] = 'audio/' + n.replace('#','%23') + '.m4a';
+});
 
 async function loadSavedAudios() {
   await openDB();
