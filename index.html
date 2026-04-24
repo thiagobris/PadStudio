@@ -661,7 +661,6 @@ footer{
     <span>MODO REMOTO</span>
     <span class="rb-sep">—</span>
     <span id="rbStatus">Conectando...</span>
-    <span class="rb-exit" onclick="exitRemoteMode()" title="Sair do modo remoto">✕</span>
   </div>
 </header>
 
@@ -739,6 +738,7 @@ footer{
           onkeydown="if(event.key==='Enter')connectAsRemote(this.value)">
    <button id="connBtn" class="conn-btn" onclick="connectAsRemote(document.getElementById('pinInput').value)">CONECTAR</button>
   </div>
+  <button id="discBtn" class="mplay" onclick="exitRemoteMode()" style="display:none;margin-top:14px;background:#c0392b;border-color:#c0392b;">DESCONECTAR</button>
  </div>
 </div>
 
@@ -1509,6 +1509,8 @@ function connectAsRemote(code) {
       const s = document.getElementById('rbStatus');
       s.textContent = 'CONECTADO'; s.classList.add('live');
       btn.textContent = 'CONECTAR'; btn.disabled = false;
+      document.getElementById('pinInput').disabled = true;
+      document.getElementById('discBtn').style.display = 'block';
       document.getElementById('hostOv').classList.remove('open');
       showToast('CONECTADO!');
     });
@@ -1546,8 +1548,10 @@ function exitRemoteMode() {
   document.getElementById('rbStatus').textContent = 'Conectando...';
   document.getElementById('rbStatus').classList.remove('live');
   document.getElementById('pinInput').value = '';
+  document.getElementById('pinInput').disabled = false;
   document.getElementById('connBtn').textContent = 'CONECTAR';
   document.getElementById('connBtn').disabled = false;
+  document.getElementById('discBtn').style.display = 'none';
 }
 
 // iOS: redireciona toda saída do Web Audio para um <audio> HTML via MediaStream
