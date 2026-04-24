@@ -118,7 +118,8 @@
 
 /* ─── RESET ─── */
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{background:var(--bg);color:var(--txt);font-family:'Syne',sans-serif;min-height:100vh;display:flex;flex-direction:column;transition:background .4s,color .4s;}
+html{overflow-x:hidden;max-width:100%;}
+body{background:var(--bg);color:var(--txt);font-family:'Syne',sans-serif;min-height:100vh;display:flex;flex-direction:column;transition:background .4s,color .4s;overflow-x:hidden;width:100%;}
 
 /* ─── HEADER ─── */
 header{
@@ -451,7 +452,6 @@ footer{
 
 /* ── Mobile (≤600px) ── */
 @media(max-width:600px){
-  html,body{overflow-x:hidden;}
 
   /* Loader */
   .ld-logo{font-size:28px;letter-spacing:3px;}
@@ -965,15 +965,35 @@ function startNote(name, o, el) {
 
   const buf = noteBuffers[name];
   if (buf) {
-    // usa o arquivo de áudio carregado — loop infinito
-    const src = ctx.createBufferSource();
-    src.buffer = buf;
-    src.loop = true;
-    src.connect(g);
-    src.start();
-    activeN[k] = { src, g };
+    const loopFade = Math.min(4, buf.duration * 0.05);
+    const state = { srcs: [], g };
+    activeN[k] = state;
+
+    function playSegment(startTime, isFirst) {
+      if (activeN[k] !== state) return;
+      const src = ctx.createBufferSource();
+      src.buffer = buf;
+      const sg = ctx.createGain();
+      src.connect(sg); sg.connect(g);
+      if (isFirst) {
+        sg.gain.setValueAtTime(1, startTime);
+      } else {
+        sg.gain.setValueAtTime(0, startTime);
+        sg.gain.linearRampToValueAtTime(1, startTime + loopFade);
+      }
+      const fadeOutAt = startTime + buf.duration - loopFade;
+      sg.gain.setValueAtTime(1, fadeOutAt);
+      sg.gain.linearRampToValueAtTime(0, startTime + buf.duration);
+      src.start(startTime);
+      src.stop(startTime + buf.duration);
+      state.srcs.push(src);
+      src.onended = () => { const i = state.srcs.indexOf(src); if (i !== -1) state.srcs.splice(i, 1); };
+      const nextStart = startTime + buf.duration - loopFade;
+      const msDelay = (nextStart - ctx.currentTime - 1) * 1000;
+      setTimeout(() => playSegment(nextStart, false), Math.max(100, msDelay));
+    }
+    playSegment(now, true);
   } else {
-    // fallback: oscilador sintetizado
     const o1 = ctx.createOscillator(), o2 = ctx.createOscillator();
     o1.type = 'triangle'; o1.frequency.value = nfreq(name, o);
     o2.type = 'sine';     o2.frequency.value = nfreq(name, o) * 1.003;
@@ -990,13 +1010,14 @@ function startNote(name, o, el) {
 
 function stopNote(k, el) {
   const nd = activeN[k]; if (!nd) return;
-  const { src, o1, o2, g } = nd;
+  const { srcs, src, o1, o2, g } = nd;
   const now = ctx.currentTime, fo = Math.max(cf, 0.05);
   g.gain.cancelScheduledValues(now);
   g.gain.setValueAtTime(g.gain.value, now);
   g.gain.linearRampToValueAtTime(0.0001, now + fo);
   const stopAt = now + fo + 0.05;
-  if (src) try { src.stop(stopAt); } catch(e) {}
+  if (srcs) srcs.forEach(s => { try { s.stop(stopAt); } catch(e) {} });
+  else if (src) try { src.stop(stopAt); } catch(e) {}
   if (o1)  try { o1.stop(stopAt); o2.stop(stopAt); } catch(e) {}
   delete activeN[k];
   if (el) el.classList.remove('on');
@@ -1100,7 +1121,7 @@ function buildNotes() {
     const b = document.createElement('button');
     b.className = 'npad'; b.dataset.note = n; b.dataset.k = n + oct;
     b.textContent = n;
-    b.addEventListener('click', () => { ripple(b); toggleNote(n, b); });
+    b.addEventListener('click', async () => { ripple(b); initCtx(); if (ctx.state !== 'running') await ctx.resume(); toggleNote(n, b); });
     g.appendChild(b);
   });
 }
@@ -1113,9 +1134,9 @@ function buildDrums() {
     const pad = document.createElement('div');
     pad.className = 'dpad';
     pad.innerHTML = `<div class="dpad-gl"></div><div class="dpad-name">${d.n}</div><div class="dpad-sub">${d.s}</div>`;
-    pad.addEventListener('click', () => {
-      ripple(pad); initCtx(); d.fn(i);
-      pad.classList.add('hit'); setSt(d.n);
+    pad.addEventListener('click', async () => {
+      ripple(pad); initCtx(); if (ctx.state !== 'running') await ctx.resume(); d.fn(i);
+      pad.classList.add('hit');
       setTimeout(() => pad.classList.remove('hit'), 130);
     });
     grid.appendChild(pad);
@@ -1229,8 +1250,8 @@ function setTheme(n) {
 }
 
 // iOS: retoma AudioContext em qualquer toque na tela
-document.addEventListener('touchstart', () => {
-  if (ctx && ctx.state !== 'running') ctx.resume();
+document.addEventListener('touchstart', async () => {
+  if (ctx && ctx.state !== 'running') await ctx.resume();
 }, { passive: true });
 
 const km={a:'C',w:'C#',s:'D',e:'D#',d:'E',f:'F',t:'F#',g:'G',y:'G#',h:'A',u:'A#',j:'B'};
@@ -1257,7 +1278,7 @@ document.addEventListener('touchstart', () => {
 function loaderProgress(n) {
   const total = NOTES.length;
   document.getElementById('ldFill').style.width = (n / total * 100) + '%';
-  document.getElementById('ldCount').textContent = n < total ? 'Carregando os Pads... ' + n + ' / ' + total : 'PRONTO!';
+  document.getElementById('ldCount').textContent = n < total ? 'Carregando os Pads...' : 'PRONTO!';
   if (n >= total) {
     setTimeout(() => {
       const ld = document.getElementById('loader');
