@@ -680,9 +680,9 @@ footer{
     <div class="nmvol">
       <div class="vol-lbl">VOLUME MASTER</div>
       <div class="vrow" style="margin-top:10px">
-        <input class="cs" id="noteMasterSl" type="range" min="0" max="100" value="80" style="--p:80%"
+        <input class="cs" id="noteMasterSl" type="range" min="0" max="100" value="50" style="--p:50%"
                oninput="sp(this);noteMV=this.value/100;if(noteMasterG)noteMasterG.gain.value=noteMV;document.getElementById('nmpct').textContent=this.value+'%';sendRemote({type:'param',k:'noteMV',v:noteMV});autoSave()">
-        <span class="vpct" id="nmpct">80%</span>
+        <span class="vpct" id="nmpct">50%</span>
       </div>
     </div>
   </div>
@@ -695,9 +695,9 @@ footer{
       <!-- master drum -->
       <div class="dv-master-row">
         <span class="dv-master-lbl">VOLUME — BATERIA</span>
-        <input class="cs" id="drumMasterSl" type="range" min="0" max="100" value="80" style="--p:80%;flex:1"
+        <input class="cs" id="drumMasterSl" type="range" min="0" max="100" value="50" style="--p:50%;flex:1"
                oninput="sp(this);drumMV=this.value/100;document.getElementById('dmpct').textContent=this.value+'%';sendRemote({type:'param',k:'drumMV',v:drumMV});autoSave()">
-        <span class="dv-master-pct" id="dmpct">80%</span>
+        <span class="dv-master-pct" id="dmpct">50%</span>
       </div>
       <!-- individual drum vols -->
       <div class="dv-grid" id="dv"></div>
@@ -758,7 +758,7 @@ footer{
    </div>
   </div>
   <div class="pg">Volume Geral</div>
-  <div class="srow"><span class="sl">Master</span><input id="cfg0" class="cs" type="range" min="0" max="100" value="80" style="--p:80%" oninput="sp(this);CS(0,this.value)"><span class="sv" id="sv0">80%</span></div>
+  <div class="srow"><span class="sl">Master</span><input id="cfg0" class="cs" type="range" min="0" max="100" value="50" style="--p:50%" oninput="sp(this);CS(0,this.value)"><span class="sv" id="sv0">50%</span></div>
   <div class="srow"><span class="sl">Pan</span><input id="cfg1" class="cs" type="range" min="0" max="100" value="50" style="--p:50%" oninput="sp(this);CS(1,this.value)"><span class="sv" id="sv1">C</span></div>
   <div class="pg">Filtros</div>
   <div class="srow"><span class="sl">Cutoff</span><input id="cfg2" class="cs" type="range" min="0" max="100" value="70" style="--p:70%" oninput="sp(this);CS(2,this.value)"><span class="sv" id="sv2">8.4k</span></div>
@@ -986,7 +986,7 @@ function autoSave() { clearTimeout(saveTimer); saveTimer = setTimeout(saveSettin
 // AUDIO ENGINE
 // ══════════════════════════════════════
 let ctx, masterG, panN, lpF, hpF, revG, dryG, noteMasterG;
-let noteMV = 0.8, drumMV = 0.8;
+let noteMV = 0.5, drumMV = 0.5;
 const drumGains = [];
 
 function initCtx() {
@@ -998,7 +998,7 @@ function initCtx() {
   ctx = new (window.AudioContext || window.webkitAudioContext)();
   ctx.resume(); // iOS: contexto começa suspenso, precisa ser retomado explicitamente
 
-  masterG     = ctx.createGain();         masterG.gain.value     = 0.8;
+  masterG     = ctx.createGain();         masterG.gain.value     = 0.5;
   noteMasterG = ctx.createGain();         noteMasterG.gain.value = noteMV;
   panN        = ctx.createStereoPanner(); panN.pan.value         = 0;
   lpF         = ctx.createBiquadFilter(); lpF.type = 'lowpass';  lpF.frequency.value = 8400;
@@ -1051,7 +1051,7 @@ const NOTES = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
 const activeN = {};          // { k: { src?, osc1?, osc2?, g } }
 const noteBuffers = {};      // { noteName: AudioBuffer }
 let oct = 4, cf = 0;
-const drumVols = Array(8).fill(0.8);
+const drumVols = Array(8).fill(0.5);
 
 function nfreq(n, o) {
   const s = {C:0,'C#':1,D:2,'D#':3,E:4,F:5,'F#':6,G:7,'G#':8,A:9,'A#':10,B:11};
@@ -1238,7 +1238,13 @@ function buildNotes() {
     b.textContent = n;
     b.addEventListener('click', async () => {
       ripple(b);
-      if (isRemoteMode) { sendRemote({type:'note', name: n}); return; }
+      if (isRemoteMode) {
+        sendRemote({type:'note', name: n});
+        const wasOn = b.classList.contains('on');
+        document.querySelectorAll('.npad').forEach(p => p.classList.remove('on'));
+        if (!wasOn) b.classList.add('on');
+        return;
+      }
       initCtx(); if (ctx.state !== 'running') await ctx.resume(); toggleNote(n, b);
     });
     g.appendChild(b);
@@ -1333,7 +1339,7 @@ function openOv(id)  { document.getElementById(id+'Ov').classList.add('open'); }
 function closeOv(id) { document.getElementById(id+'Ov').classList.remove('open'); }
 
 function resetSettings() {
-  const defs = [80, 50, 70, 5, 25];
+  const defs = [50, 50, 70, 5, 25];
   defs.forEach((v, i) => {
     const sl = document.getElementById('cfg' + i);
     if (sl) { sl.value = v; sp(sl); CS(i, v); }
@@ -1641,6 +1647,8 @@ startLoading();
   const hostCode = localStorage.getItem('ps_host_code');
   if (remCode) {
     document.getElementById('pinInput').value = remCode;
+    document.getElementById('remoteBanner').style.display = 'flex';
+    document.getElementById('rbStatus').textContent = 'Conectando...';
     setTimeout(() => connectAsRemote(remCode), 1500);
   } else if (hostCode) {
     generateHostCode(hostCode);
