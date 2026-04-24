@@ -467,8 +467,8 @@ footer{
   .hb svg{width:16px;height:16px;}
 
   /* Linha 2 header */
-  .hctr{order:3;flex-basis:100%;flex:none;gap:6px;min-width:0;justify-content:flex-start;}
-  .hpill-status{width:auto;flex:1;min-width:0;padding:7px 10px;gap:5px;}
+  .hctr{order:3;flex-basis:100%;flex:none;gap:6px;min-width:0;justify-content:center;}
+  .hpill-status{width:auto;flex:none;padding:7px 16px;gap:6px;}
   .sd{width:7px;height:7px;flex-shrink:0;}
   .stxt{font-size:10px;white-space:nowrap;}
   .stimer{font-size:10px;min-width:26px;flex-shrink:0;}
@@ -884,6 +884,11 @@ function sendRemote(data) {
   if (isRemoteMode && _peerConn && _peerConn.open) _peerConn.send(data);
 }
 
+// Envia do host para o celular (canal inverso)
+function sendToMobile(data) {
+  if (!isRemoteMode && _peerConn && _peerConn.open) _peerConn.send(data);
+}
+
 // Garante que o AudioContext está rodando antes de tocar qualquer som
 async function _ensureCtxRunning() {
   initCtx();
@@ -1129,6 +1134,7 @@ function startNote(name, o, el) {
   document.getElementById('niTom').textContent = name;
   setSt('PAD ' + name);
   startTimer();
+  sendToMobile({type:'sync', niTom: name, st: 'PAD ' + name, run: true});
 }
 
 function stopNote(k, el) {
@@ -1148,6 +1154,7 @@ function stopNote(k, el) {
     setSt('PARADO', false);
     document.getElementById('niTom').textContent = '—';
     stopTimer();
+    sendToMobile({type:'sync', niTom: '—', st: 'PARADO', run: false});
   }
 }
 
@@ -1525,6 +1532,15 @@ function connectAsRemote(code) {
       document.getElementById('discBtn').style.display = 'block';
       document.getElementById('hostOv').classList.remove('open');
       showToast('CONECTADO!');
+    });
+    conn.on('data', ev => {
+      if (ev.type === 'sync') {
+        document.getElementById('niTom').textContent = ev.niTom;
+        document.getElementById('stxt').textContent = ev.st;
+        const d = document.getElementById('sd');
+        if (ev.run) { d.classList.add('on'); startTimer(); }
+        else { d.classList.remove('on'); stopTimer(); }
+      }
     });
     conn.on('close', () => {
       _peerConn = null;
