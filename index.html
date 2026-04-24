@@ -1247,8 +1247,15 @@ function setTheme(n) {
   autoSave();
 }
 
-// iOS: retoma AudioContext em qualquer toque na tela
+// iOS: ignora chave de silencioso tocando áudio HTML (muda sessão de "ambient" para "playback")
+let iosSilentUnlocked = false;
 document.addEventListener('touchstart', async () => {
+  if (!iosSilentUnlocked) {
+    iosSilentUnlocked = true;
+    const a = new Audio();
+    a.src = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
+    a.play().catch(() => {});
+  }
   if (ctx && ctx.state !== 'running') await ctx.resume();
 }, { passive: true });
 
