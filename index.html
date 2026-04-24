@@ -887,6 +887,14 @@ function sendRemote(data) {
   if (isRemoteMode && _peerConn && _peerConn.open) _peerConn.send(data);
 }
 
+// Garante que o AudioContext está rodando antes de tocar qualquer som
+async function _ensureCtxRunning() {
+  initCtx();
+  if (ctx.state === 'running') return true;
+  try { await ctx.resume(); } catch(e) {}
+  return ctx.state === 'running';
+}
+
 // ══════════════════════════════════════
 // INDEXEDDB — armazena AudioBuffers
 // ══════════════════════════════════════
@@ -1470,21 +1478,18 @@ function generateHostCode(savedCode) {
       if (ev.type === 'note') {
         const el = document.querySelector('.npad[data-note="' + ev.name + '"]');
         if (el) ripple(el);
-        initCtx();
-        if (ctx.state !== 'running') await ctx.resume();
+        if (!await _ensureCtxRunning()) { showToast('CLIQUE NA TELA PARA ATIVAR O SOM'); return; }
         toggleNote(ev.name, el);
       } else if (ev.type === 'drum') {
         const pads = document.querySelectorAll('.dpad');
         const p = pads[ev.i];
         if (p) { ripple(p); p.classList.add('hit'); setTimeout(() => p.classList.remove('hit'), 130); }
-        initCtx();
-        if (ctx.state !== 'running') await ctx.resume();
+        if (!await _ensureCtxRunning()) { showToast('CLIQUE NA TELA PARA ATIVAR O SOM'); return; }
         DRUMS[ev.i].fn(ev.i);
       } else if (ev.type === 'param') {
         _applyParam(ev);
       } else if (ev.type === 'metro') {
-        initCtx();
-        if (ctx.state !== 'running') await ctx.resume();
+        if (!await _ensureCtxRunning()) return;
         _applyMetro(ev);
       }
     });
@@ -1601,6 +1606,11 @@ document.addEventListener('touchstart', async () => {
   initCtx();
   await unlockIosSilent();
   if (ctx && ctx.state !== 'running') await ctx.resume();
+}, { passive: true });
+
+// Desbloqueia AudioContext no primeiro clique do mouse (desktop sem gesto prévio)
+document.addEventListener('pointerdown', () => {
+  if (ctx && ctx.state !== 'running') ctx.resume().catch(() => {});
 }, { passive: true });
 
 const km={a:'C',w:'C#',s:'D',e:'D#',d:'E',f:'F',t:'F#',g:'G',y:'G#',h:'A',u:'A#',j:'B'};
