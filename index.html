@@ -544,7 +544,7 @@ footer{
 /* ─── REMOTE CONTROL ─── */
 .remote-row{
   order:10;flex-basis:100%;
-  display:flex;align-items:center;justify-content:center;gap:8px;
+  display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:nowrap;
   border-top:1px solid var(--bor);padding-top:8px;margin-top:2px;
   font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1.5px;
   color:var(--non-col);
@@ -553,8 +553,78 @@ footer{
 .rb-sep{color:var(--txt2);}
 #rbStatus{color:var(--txt2);}
 #rbStatus.live{color:var(--acc2);}
-.rb-exit{margin-left:10px;cursor:pointer;color:var(--txt2);font-size:13px;opacity:.6;transition:opacity .15s;line-height:1;}
-.rb-exit:hover{opacity:1;}
+.rb-disc{
+  margin-left:auto;padding:3px 10px;border-radius:7px;
+  background:rgba(255,71,71,0.09);border:1px solid rgba(255,71,71,0.4);
+  color:#ff4747;font-size:9px;letter-spacing:1px;cursor:pointer;
+  transition:background .15s;white-space:nowrap;
+}
+.rb-disc:hover{background:rgba(255,71,71,0.2);}
+
+/* ─── HOST SCREEN (desktop) ─── */
+.host-screen{
+  display:none;flex:1;flex-direction:column;align-items:center;justify-content:center;
+  gap:18px;padding:48px 32px;text-align:center;
+}
+body.mode-desktop .host-screen{display:flex;}
+body.mode-desktop header,body.mode-desktop main,body.mode-desktop footer{display:none!important;}
+.hs-brand{font-family:'Space Mono',monospace;font-size:20px;font-weight:700;letter-spacing:4px;color:var(--acc);}
+.hs-brand b{color:var(--txt);}
+.hs-role{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--txt2);margin-top:-6px;}
+.hs-code{
+  font-family:'Space Mono',monospace;font-size:76px;font-weight:700;letter-spacing:18px;
+  color:var(--acc);padding:24px 40px;
+  background:var(--sur);border:1px solid var(--bor);border-radius:22px;
+  line-height:1;min-width:320px;
+}
+.hs-sts{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:1.5px;color:var(--txt2);}
+.hs-sts.ok{color:var(--acc2);}
+.hs-btn{
+  background:var(--non-bg);border:1px solid var(--acc);color:var(--acc);
+  font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2px;
+  padding:13px 28px;border-radius:12px;cursor:pointer;transition:all .2s;
+}
+.hs-btn:hover{filter:brightness(1.1);}
+.hs-chip{
+  display:none;align-items:center;justify-content:center;gap:8px;
+  background:rgba(71,255,178,0.09);border:1px solid var(--acc2);
+  border-radius:12px;padding:12px 22px;
+  font-family:'Space Mono',monospace;font-size:11px;letter-spacing:1px;color:var(--acc2);
+}
+.hs-chip.show{display:flex;}
+.hs-dot{width:8px;height:8px;border-radius:50%;background:var(--acc2);box-shadow:0 0 8px var(--acc2);flex-shrink:0;}
+
+/* ─── CONNECT SCREEN (mobile pre-connection) ─── */
+.connect-screen{
+  display:none;flex:1;flex-direction:column;align-items:center;justify-content:center;
+  gap:20px;padding:48px 32px;text-align:center;
+}
+body.mode-mobile:not(.connected) .connect-screen{display:flex;}
+body.mode-mobile:not(.connected) main,
+body.mode-mobile:not(.connected) footer{display:none!important;}
+body.mode-mobile .hb-host{display:none!important;}
+.cs-brand{font-family:'Space Mono',monospace;font-size:20px;font-weight:700;letter-spacing:4px;color:var(--acc);}
+.cs-brand b{color:var(--txt);}
+.cs-role{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--txt2);margin-top:-6px;}
+.cs-hint{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.5px;color:var(--txt2);line-height:1.7;}
+.pin-input.big{
+  width:100%;max-width:260px;height:76px;border-radius:16px;
+  background:var(--sur);border:2px solid var(--bor);
+  color:var(--acc);font-family:'Space Mono',monospace;
+  font-size:44px;font-weight:700;letter-spacing:14px;
+  text-align:center;outline:none;-webkit-appearance:none;
+  transition:border-color .15s;
+}
+.pin-input.big:focus{border-color:var(--acc);}
+.pin-input.big::placeholder{color:var(--txt2);font-size:26px;letter-spacing:6px;font-weight:400;}
+.cs-btn{
+  width:100%;max-width:260px;padding:16px;border-radius:14px;
+  background:var(--non-bg);border:1px solid var(--acc);color:var(--acc);
+  font-family:'Space Mono',monospace;font-size:12px;letter-spacing:2px;
+  cursor:pointer;transition:all .2s;
+}
+.cs-btn:disabled{opacity:.4;cursor:not-allowed;}
+.cs-btn:not(:disabled):hover{filter:brightness(1.1);}
 
 /* REMOTE PANEL */
 .host-code-display{
@@ -621,7 +691,7 @@ footer{
     <div class="hpill">
       <span class="hl">CROSSFADE</span>
       <input class="cf" id="cfsl" type="range" min="0" max="10" step="1" value="0"
-             oninput="cf=+this.value;document.getElementById('cfv').textContent=this.value+'s';autoSave()">
+             oninput="cf=+this.value;document.getElementById('cfv').textContent=this.value+'s';sendRemote({type:'param',k:'cf',v:cf});autoSave()">
       <span class="hv" id="cfv">0s</span>
     </div>
   </div>
@@ -658,12 +728,38 @@ footer{
   <!-- remote mode indicator -->
   <div id="remoteBanner" class="remote-row" style="display:none">
     <div class="rb-dot"></div>
-    <span>MODO REMOTO</span>
+    <span>REMOTO</span>
     <span class="rb-sep">—</span>
     <span id="rbStatus">Conectando...</span>
-    <span class="rb-exit" onclick="exitRemoteMode()" title="Sair do modo remoto">✕</span>
+    <button class="rb-disc" onclick="exitRemoteMode()">DESCONECTAR</button>
   </div>
 </header>
+
+<!-- HOST SCREEN — shown on desktop -->
+<div class="host-screen" id="hostScreen">
+  <div class="hs-brand">PAD<b>STUDIO</b></div>
+  <div class="hs-role">Computador · Anfitrião</div>
+  <div class="hs-code" id="hsCode">—</div>
+  <div class="hs-sts" id="hsSts">Clique para gerar um código</div>
+  <button class="hs-btn" onclick="generateHostCode()">GERAR NOVO CÓDIGO</button>
+  <div class="hs-chip" id="hsChip">
+    <span class="hs-dot"></span>Celular conectado — controlando remotamente
+  </div>
+</div>
+
+<!-- CONNECT SCREEN — shown on mobile before connecting -->
+<div class="connect-screen" id="connectScreen">
+  <div class="cs-brand">PAD<b>STUDIO</b></div>
+  <div class="cs-role">Celular · Controle Remoto</div>
+  <p class="cs-hint">Digite o código de 4 dígitos<br>exibido no computador</p>
+  <input id="pinInput" class="pin-input big" type="text" inputmode="numeric"
+         maxlength="4" placeholder="0000"
+         oninput="this.value=this.value.replace(/\D/g,'').slice(0,4)"
+         onkeydown="if(event.key==='Enter')connectAsRemote(this.value)">
+  <button id="connBtn" class="cs-btn" onclick="connectAsRemote(document.getElementById('pinInput').value)">
+    CONECTAR
+  </button>
+</div>
 
 <!-- MAIN -->
 <main>
@@ -682,7 +778,7 @@ footer{
       <div class="vol-lbl">VOLUME MASTER</div>
       <div class="vrow" style="margin-top:10px">
         <input class="cs" id="noteMasterSl" type="range" min="0" max="100" value="80" style="--p:80%"
-               oninput="sp(this);noteMV=this.value/100;if(noteMasterG)noteMasterG.gain.value=noteMV;document.getElementById('nmpct').textContent=this.value+'%';autoSave()">
+               oninput="sp(this);noteMV=this.value/100;if(noteMasterG)noteMasterG.gain.value=noteMV;document.getElementById('nmpct').textContent=this.value+'%';sendRemote({type:'param',k:'noteMasterVol',v:noteMV});autoSave()">
         <span class="vpct" id="nmpct">80%</span>
       </div>
     </div>
@@ -697,7 +793,7 @@ footer{
       <div class="dv-master-row">
         <span class="dv-master-lbl">VOLUME — BATERIA</span>
         <input class="cs" id="drumMasterSl" type="range" min="0" max="100" value="80" style="--p:80%;flex:1"
-               oninput="sp(this);drumMV=this.value/100;document.getElementById('dmpct').textContent=this.value+'%';autoSave()">
+               oninput="sp(this);drumMV=this.value/100;document.getElementById('dmpct').textContent=this.value+'%';sendRemote({type:'param',k:'drumMasterVol',v:drumMV});autoSave()">
         <span class="dv-master-pct" id="dmpct">80%</span>
       </div>
       <!-- individual drum vols -->
@@ -758,13 +854,13 @@ footer{
    </div>
   </div>
   <div class="pg">Volume Geral</div>
-  <div class="srow"><span class="sl">Master</span><input id="cfg0" class="cs" type="range" min="0" max="100" value="80" style="--p:80%" oninput="sp(this);CS(0,this.value)"><span class="sv" id="sv0">80%</span></div>
-  <div class="srow"><span class="sl">Pan</span><input id="cfg1" class="cs" type="range" min="0" max="100" value="50" style="--p:50%" oninput="sp(this);CS(1,this.value)"><span class="sv" id="sv1">C</span></div>
+  <div class="srow"><span class="sl">Master</span><input id="cfg0" class="cs" type="range" min="0" max="100" value="80" style="--p:80%" oninput="sp(this);CS(0,this.value);sendRemote({type:'param',k:'cfg',i:0,v:+this.value})"><span class="sv" id="sv0">80%</span></div>
+  <div class="srow"><span class="sl">Pan</span><input id="cfg1" class="cs" type="range" min="0" max="100" value="50" style="--p:50%" oninput="sp(this);CS(1,this.value);sendRemote({type:'param',k:'cfg',i:1,v:+this.value})"><span class="sv" id="sv1">C</span></div>
   <div class="pg">Filtros</div>
-  <div class="srow"><span class="sl">Cutoff</span><input id="cfg2" class="cs" type="range" min="0" max="100" value="70" style="--p:70%" oninput="sp(this);CS(2,this.value)"><span class="sv" id="sv2">8.4k</span></div>
-  <div class="srow"><span class="sl">HPF</span><input id="cfg3" class="cs" type="range" min="0" max="100" value="5" style="--p:5%" oninput="sp(this);CS(3,this.value)"><span class="sv" id="sv3">40Hz</span></div>
+  <div class="srow"><span class="sl">Cutoff</span><input id="cfg2" class="cs" type="range" min="0" max="100" value="70" style="--p:70%" oninput="sp(this);CS(2,this.value);sendRemote({type:'param',k:'cfg',i:2,v:+this.value})"><span class="sv" id="sv2">8.4k</span></div>
+  <div class="srow"><span class="sl">HPF</span><input id="cfg3" class="cs" type="range" min="0" max="100" value="5" style="--p:5%" oninput="sp(this);CS(3,this.value);sendRemote({type:'param',k:'cfg',i:3,v:+this.value})"><span class="sv" id="sv3">40Hz</span></div>
   <div class="pg">Reverb</div>
-  <div class="srow"><span class="sl">Mix</span><input id="cfg4" class="cs" type="range" min="0" max="100" value="25" style="--p:25%" oninput="sp(this);CS(4,this.value)"><span class="sv" id="sv4">25%</span></div>
+  <div class="srow"><span class="sl">Mix</span><input id="cfg4" class="cs" type="range" min="0" max="100" value="25" style="--p:25%" oninput="sp(this);CS(4,this.value);sendRemote({type:'param',k:'cfg',i:4,v:+this.value})"><span class="sv" id="sv4">25%</span></div>
  </div>
 </div>
 
@@ -877,14 +973,22 @@ footer{
 // ══════════════════════════════════════
 // PEER / REMOTE CONTROL
 // ══════════════════════════════════════
+const isDesktopDevice = window.matchMedia('(hover:hover) and (pointer:fine)').matches;
 let isRemoteMode = false;
 let _remoteCode = null;
 let _myPeer = null;
 let _peerConn = null;
 let _reconnTimer = null;
 
+// only sends when mobile is connected as remote
 function sendRemote(data) {
-  if (_peerConn && _peerConn.open) _peerConn.send(data);
+  if (isRemoteMode && _peerConn && _peerConn.open) _peerConn.send(data);
+}
+
+// preserve mode/connected body classes when changing theme
+function _bodyModeClasses() {
+  const keep = ['mode-desktop','mode-mobile','connected'];
+  return keep.filter(c => document.body.classList.contains(c));
 }
 
 // ══════════════════════════════════════
@@ -938,7 +1042,11 @@ function loadSettings() {
     if (d.cf    !== undefined) cf     = d.cf;
     if (d.oct   !== undefined) oct    = d.oct;
     if (d.drumVols) d.drumVols.forEach((v,i) => drumVols[i] = v);
-    if (d.theme) { document.body.className = d.theme; }
+    if (d.theme) {
+      const theme = d.theme.replace(/mode-\w+/g,'').replace(/connected/g,'').trim();
+      const cls = [..._bodyModeClasses(), theme].filter(Boolean).join(' ');
+      document.body.className = cls;
+    }
 
     // apply to UI after DOM built
     requestAnimationFrame(() => {
@@ -1273,7 +1381,7 @@ function buildDrums() {
       <div class="dv-sub">${d.s}</div>
       <div class="dv-row">
         <input class="cs" type="range" min="0" max="100" value="${Math.round(drumVols[i]*100)}" style="--p:${Math.round(drumVols[i]*100)}%" id="dsl${i}"
-               oninput="sp(this);drumVols[${i}]=this.value/100;if(drumGains[${i}])drumGains[${i}].gain.value=drumVols[${i}];document.getElementById('${pid}').textContent=this.value+'%';autoSave()">
+               oninput="sp(this);drumVols[${i}]=this.value/100;if(drumGains[${i}])drumGains[${i}].gain.value=drumVols[${i}];document.getElementById('${pid}').textContent=this.value+'%';sendRemote({type:'param',k:'drumVol',i:${i},v:drumVols[${i}]});autoSave()">
         <span class="dv-pct" id="${pid}">${Math.round(drumVols[i]*100)}%</span>
       </div>`;
     vols.appendChild(item);
@@ -1295,6 +1403,7 @@ function setOct(n) {
   oct = n;
   document.querySelectorAll('.ob').forEach(b => b.classList.toggle('a', +b.textContent === n));
   document.querySelectorAll('.npad').forEach((b, i) => b.dataset.k = NOTES[i]+n);
+  sendRemote({type:'param', k:'oct', v:n});
   autoSave();
 }
 
@@ -1310,13 +1419,23 @@ function setSt(txt, keep=true) {
 }
 
 function CS(i, v) {
-  v = +v; initCtx();
+  v = +v;
   const sv = document.getElementById('sv'+i);
-  if (i===0) { masterG.gain.value=v/100; sv.textContent=v+'%'; }
-  else if (i===1) { panN.pan.value=(v-50)/50; sv.textContent=v==50?'C':(v<50?'L'+(50-v):'R'+(v-50)); }
-  else if (i===2) { const hz=200+(v/100)*11800; lpF.frequency.value=hz; sv.textContent=hz>=1000?(hz/1000).toFixed(1)+'k':Math.round(hz)+'Hz'; }
-  else if (i===3) { const hz=20+(v/100)*1180; hpF.frequency.value=hz; sv.textContent=hz>=1000?(hz/1000).toFixed(1)+'k':Math.round(hz)+'Hz'; }
-  else if (i===4) { revG.gain.value=v/100; dryG.gain.value=1-v/100; sv.textContent=v+'%'; }
+  if (!isRemoteMode) {
+    initCtx();
+    if (i===0 && masterG) masterG.gain.value=v/100;
+    else if (i===1 && panN) panN.pan.value=(v-50)/50;
+    else if (i===2 && lpF) lpF.frequency.value=200+(v/100)*11800;
+    else if (i===3 && hpF) hpF.frequency.value=20+(v/100)*1180;
+    else if (i===4 && revG) { revG.gain.value=v/100; dryG.gain.value=1-v/100; }
+  }
+  if (sv) {
+    if (i===0) sv.textContent=v+'%';
+    else if (i===1) sv.textContent=v==50?'C':(v<50?'L'+(50-v):'R'+(v-50));
+    else if (i===2) { const hz=200+(v/100)*11800; sv.textContent=hz>=1000?(hz/1000).toFixed(1)+'k':Math.round(hz)+'Hz'; }
+    else if (i===3) { const hz=20+(v/100)*1180; sv.textContent=hz>=1000?(hz/1000).toFixed(1)+'k':Math.round(hz)+'Hz'; }
+    else if (i===4) sv.textContent=v+'%';
+  }
 }
 
 function openOv(id)  { document.getElementById(id+'Ov').classList.add('open'); }
@@ -1339,7 +1458,8 @@ function setBPM(v) {
   document.getElementById('bdisp').textContent = bpm;
   document.getElementById('bsl').value = bpm;
   document.getElementById('bsl').style.setProperty('--p', ((bpm-40)/200*100)+'%');
-  if (mRun) { stopMetro(); startMetro(); }
+  if (mRun && !isRemoteMode) { stopMetro(); startMetro(); }
+  sendRemote({type:'metro', action:'bpm', v:bpm});
 }
 function chBPM(d) { setBPM(bpm+d); }
 function setComp(n, el) { comp=n; document.querySelectorAll('.cbtn').forEach(b=>b.classList.remove('a')); el.classList.add('a'); buildBeats(); bIdx=0; }
@@ -1360,43 +1480,62 @@ function playClick(str){initCtx();const o=ctx.createOscillator(),g=ctx.createGai
 function startMetro(){tickBeat();mInt=setInterval(tickBeat,(60/bpm)*1000);}
 function stopMetro(){clearInterval(mInt);document.querySelectorAll('.bdot').forEach(d=>d.classList.remove('on'));bIdx=0;}
 function togMetro(){
-  initCtx();mRun=!mRun;
+  mRun=!mRun;
   const btn=document.getElementById('mplaybtn'),hb=document.getElementById('mhb');
-  if(mRun){startMetro();btn.textContent='■  PARAR';btn.classList.add('run');hb.classList.add('on');}
-  else{stopMetro();btn.textContent='▶  INICIAR';btn.classList.remove('run');hb.classList.remove('on');}
+  if(mRun){btn.textContent='■  PARAR';btn.classList.add('run');if(hb)hb.classList.add('on');}
+  else{btn.textContent='▶  INICIAR';btn.classList.remove('run');if(hb)hb.classList.remove('on');}
+  if (!isRemoteMode) { initCtx(); if(mRun) startMetro(); else stopMetro(); }
+  sendRemote({type:'metro', action:'toggle'});
 }
 
 function setTheme(n) {
-  document.body.className = n?'t-'+n:'';
+  const cls = [..._bodyModeClasses(), n?'t-'+n:''].filter(Boolean).join(' ');
+  document.body.className = cls;
   document.querySelectorAll('.tc').forEach(c=>c.classList.remove('a'));
-  document.getElementById('t-'+n).classList.add('a');
+  const el = document.getElementById('t-'+(n||''));
+  if (el) el.classList.add('a');
+  sendRemote({type:'theme', name: n});
   autoSave();
 }
 
 // ── HOST MODE ──
-function openHostMode() {
-  document.getElementById('hostOv').classList.add('open');
+function openHostMode() { document.getElementById('hostOv').classList.add('open'); }
+function closeHostOv() { document.getElementById('hostOv').classList.remove('open'); }
+
+function _hsSet(code, sts, stsOk, chipShow) {
+  const c=document.getElementById('hsCode'), s=document.getElementById('hsSts'), ch=document.getElementById('hsChip');
+  const c2=document.getElementById('hostCodeDisplay'), s2=document.getElementById('hostSts'), ch2=document.getElementById('hostChip');
+  if(c) c.textContent = code||'—';
+  if(s){ s.textContent=sts; s.className='hs-sts'+(stsOk?' ok':''); }
+  if(ch) ch.className='hs-chip'+(chipShow?' show':'');
+  if(c2) c2.textContent = code||'—';
+  if(s2){ s2.textContent=sts; s2.className='host-sts'+(stsOk?' ok':''); }
+  if(ch2) ch2.style.display = chipShow?'flex':'none';
+  const hb=document.getElementById('hostHb'); if(hb) hb.classList.toggle('on', chipShow);
 }
 
-function closeHostOv() { document.getElementById('hostOv').classList.remove('open'); }
+function _applyHostParam(ev) {
+  initCtx();
+  switch(ev.k) {
+    case 'noteMasterVol': noteMV=ev.v; if(noteMasterG) noteMasterG.gain.value=ev.v; break;
+    case 'drumMasterVol': drumMV=ev.v; break;
+    case 'drumVol': drumVols[ev.i]=ev.v; if(drumGains[ev.i]) drumGains[ev.i].gain.value=ev.v; break;
+    case 'cf': cf=ev.v; break;
+    case 'oct': setOct(ev.v); break;
+    case 'cfg': CS(ev.i, ev.v); break;
+  }
+}
 
 function generateHostCode() {
   const code = String(Math.floor(Math.random() * 9000) + 1000);
-  document.getElementById('hostCodeDisplay').textContent = code;
-  document.getElementById('hostSts').textContent = 'Aguardando celular...';
-  document.getElementById('hostSts').className = 'host-sts';
-  document.getElementById('hostChip').style.display = 'none';
-  document.getElementById('hostHb').classList.remove('on');
+  _hsSet(code, 'Aguardando celular...', false, false);
 
   if (_myPeer && !_myPeer.destroyed) _myPeer.destroy();
 
   _myPeer = new Peer('ps-' + code);
   _myPeer.on('connection', conn => {
     _peerConn = conn;
-    document.getElementById('hostSts').textContent = 'Celular conectado!';
-    document.getElementById('hostSts').classList.add('ok');
-    document.getElementById('hostChip').style.display = 'flex';
-    document.getElementById('hostHb').classList.add('on');
+    _hsSet(code, 'Celular conectado!', true, true);
     conn.on('data', ev => {
       if (ev.type === 'note') {
         const el = document.querySelector('.npad[data-note="' + ev.name + '"]');
@@ -1409,19 +1548,24 @@ function generateHostCode() {
         if (p) { ripple(p); p.classList.add('hit'); setTimeout(() => p.classList.remove('hit'), 130); }
         initCtx(); if (ctx.state !== 'running') ctx.resume();
         DRUMS[ev.i].fn(ev.i);
+      } else if (ev.type === 'param') {
+        _applyHostParam(ev);
+      } else if (ev.type === 'metro') {
+        if (ev.action === 'toggle') togMetro();
+        else if (ev.action === 'bpm') setBPM(ev.v);
+        else if (ev.action === 'comp') { comp=ev.v; buildBeats(); bIdx=0; }
+      } else if (ev.type === 'theme') {
+        setTheme(ev.name);
       }
     });
     conn.on('close', () => {
-      document.getElementById('hostSts').textContent = 'Aguardando reconexão...';
-      document.getElementById('hostSts').classList.remove('ok');
-      document.getElementById('hostChip').style.display = 'none';
-      document.getElementById('hostHb').classList.remove('on');
+      _hsSet(code, 'Aguardando reconexão...', false, false);
       _peerConn = null;
     });
   });
   _myPeer.on('error', err => {
     if (err.type === 'unavailable-id') { generateHostCode(); return; }
-    document.getElementById('hostSts').textContent = 'Erro: ' + err.type;
+    _hsSet(null, 'Erro: ' + err.type, false, false);
   });
 }
 
@@ -1438,11 +1582,12 @@ function connectAsRemote(code) {
     _peerConn = conn;
     conn.on('open', () => {
       isRemoteMode = true;
+      document.body.classList.add('connected');
       document.getElementById('remoteBanner').style.display = 'flex';
       const s = document.getElementById('rbStatus');
       s.textContent = 'CONECTADO'; s.classList.add('live');
       btn.textContent = 'CONECTAR'; btn.disabled = false;
-      document.getElementById('hostOv').classList.remove('open');
+      closeHostOv();
       showToast('CONECTADO!');
     });
     conn.on('close', () => {
@@ -1474,12 +1619,13 @@ function exitRemoteMode() {
   clearTimeout(_reconnTimer);
   if (_peerConn) { try { _peerConn.close(); } catch(e){} _peerConn = null; }
   if (_myPeer) { try { _myPeer.destroy(); } catch(e){} _myPeer = null; }
+  document.body.classList.remove('connected');
   document.getElementById('remoteBanner').style.display = 'none';
   document.getElementById('rbStatus').textContent = 'Conectando...';
   document.getElementById('rbStatus').classList.remove('live');
-  document.getElementById('pinInput').value = '';
-  document.getElementById('connBtn').textContent = 'CONECTAR';
-  document.getElementById('connBtn').disabled = false;
+  const pin = document.getElementById('pinInput'); if(pin) pin.value = '';
+  const btn = document.getElementById('connBtn');
+  if(btn){ btn.textContent = 'CONECTAR'; btn.disabled = false; }
 }
 
 // iOS: redireciona toda saída do Web Audio para um <audio> HTML via MediaStream
@@ -1555,6 +1701,13 @@ document.addEventListener('touchstart', () => {
 // ══════════════════════════════════════
 // INIT
 // ══════════════════════════════════════
+// Device mode setup
+if (isDesktopDevice) {
+  document.body.classList.add('mode-desktop');
+} else {
+  document.body.classList.add('mode-mobile');
+}
+
 buildNotes();
 buildDrums();
 buildBeats();
@@ -1562,6 +1715,11 @@ loadSettings();
 prefetchPromise = prefetchAudios();
 loadingStarted = true;
 startLoading();
+
+// Desktop auto-generates code; mobile waits for user to connect
+if (isDesktopDevice) {
+  generateHostCode();
+}
 </script>
 <div class="toast" id="toast"></div>
 </body>
