@@ -443,11 +443,77 @@ input.cs::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:v
 
 /* ─── RESPONSIVE ─── */
 @media(max-width:720px){
-  main{grid-template-columns:1fr;padding:20px 16px;}
-  .dgrid{grid-template-columns:repeat(4,1fr);}
+  main{grid-template-columns:1fr;padding:16px 14px;gap:14px;}
   .dv-grid{grid-template-columns:repeat(2,1fr);}
-  .hpill{padding:8px 12px;}
-  .hctr{gap:8px;}
+}
+
+@media(max-width:600px){
+  html,body{overflow-x:hidden;}
+
+  /* ── Header: linha 1 = logo + botões | linha 2 = pills ── */
+  header{padding:12px 16px;gap:8px;}
+  .logo{order:1;flex:1;font-size:14px;letter-spacing:2px;}
+  .hbtns{order:2;flex-shrink:0;gap:6px;}
+  .hb{width:48px;height:48px;border-radius:12px;}
+  .hb svg{width:22px;height:22px;}
+  .hctr{order:3;flex-basis:100%;gap:8px;}
+  .hpill{flex:1;padding:10px 13px;border-radius:13px;min-width:0;}
+  .hpill-status{width:auto;}
+  .hl{font-size:10px;letter-spacing:0.8px;}
+  .hv{font-size:12px;min-width:20px;}
+  .stxt{font-size:11px;}
+  .sd{width:9px;height:9px;}
+  input.cf{flex:1;min-width:0;width:auto;}
+
+  /* ── Conteúdo ── */
+  main{padding:12px 12px;gap:12px;}
+  .lcol{gap:12px;}
+  .rcol{gap:12px;}
+
+  /* ── Note pads ── */
+  .ngrid{gap:7px;}
+  .npad{height:76px;font-size:16px;border-radius:14px;touch-action:manipulation;}
+
+  /* ── Note info ── */
+  .ninfo{padding:13px 15px;border-radius:14px;}
+  .ni-lbl{font-size:10px;}
+  .ni-tom{font-size:28px;margin:3px 0 5px;}
+  .ni-kit{font-size:12px;}
+
+  /* ── Volume notas ── */
+  .nmvol{padding:14px 16px;border-radius:14px;}
+  .vol-lbl{font-size:11px;letter-spacing:1px;margin-bottom:12px;}
+
+  /* ── Drum pads ── */
+  .dgrid{grid-template-columns:repeat(4,1fr);gap:7px;}
+  .dpad{height:84px;padding:10px 10px;border-radius:13px;touch-action:manipulation;}
+  .dpad-name{font-size:12px;}
+  .dpad-sub{font-size:9px;}
+
+  /* ── Drum volumes ── */
+  .dvols{padding:14px 16px;gap:12px;border-radius:14px;}
+  .dv-grid{grid-template-columns:repeat(2,1fr);gap:12px 14px;}
+  .dv-master-row{padding-bottom:12px;}
+  .dv-master-lbl{font-size:10px;letter-spacing:1px;width:auto;flex-shrink:1;}
+  .dv-name{font-size:11px;}
+  .dv-sub{font-size:8px;}
+  .dv-pct{font-size:10px;}
+
+  /* ── Thumbs maiores para toque ── */
+  input.cs::-webkit-slider-thumb{width:26px;height:26px;}
+  input.cs::-moz-range-thumb{width:26px;height:26px;}
+
+  /* ── Panels / modais ── */
+  .panel{width:96%;padding:20px 18px 18px;border-radius:20px;max-height:88vh;}
+  .ptit{font-size:16px;}
+  .mbtn{padding:10px 16px;font-size:15px;}
+  .bpmnum{font-size:46px;}
+  .mplay{padding:14px;font-size:12px;}
+  .tgrid{gap:10px;}
+  .tc-thumb{height:64px;}
+  .tc-info{padding:10px 12px 11px;}
+  .tc-name{font-size:12px;}
+  .tc-desc{font-size:8px;}
 }
 </style>
 </head>
