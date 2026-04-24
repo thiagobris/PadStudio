@@ -460,7 +460,7 @@ input.cs::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:v
   <button class="ld-btn" id="ldBtn" onclick="startApp()">▶ &nbsp;TOQUE PARA COMEÇAR</button>
   <div class="ld-prog" id="ldProg">
     <div class="ld-bar-bg"><div class="ld-bar-fill" id="ldFill"></div></div>
-    <div class="ld-count" id="ldCount">0 / 12</div>
+    <div class="ld-count" id="ldCount">Carregando os Pads...</div>
   </div>
 </div>
 
@@ -1128,7 +1128,7 @@ function startApp() {
 function loaderProgress(n) {
   const total = NOTES.length;
   document.getElementById('ldFill').style.width = (n / total * 100) + '%';
-  document.getElementById('ldCount').textContent = n < total ? n + ' / ' + total : 'PRONTO!';
+  document.getElementById('ldCount').textContent = n < total ? 'Carregando os Pads... ' + n + ' / ' + total : 'PRONTO!';
   if (n >= total) {
     setTimeout(() => {
       const ld = document.getElementById('loader');
