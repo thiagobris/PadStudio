@@ -216,6 +216,24 @@ main{
   opacity:0.55;
 }
 
+/* audio unlock gate */
+.audio-gate{
+  position:fixed;inset:0;z-index:2000;
+  background:rgba(0,0,0,.82);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+}
+.audio-gate-box{
+  background:var(--acc);color:#000;
+  font-family:'Space Mono',monospace;
+  border-radius:20px;padding:40px 52px;
+  text-align:center;pointer-events:none;
+  max-width:320px;
+}
+.audio-gate-title{font-size:14px;letter-spacing:2px;font-weight:bold;line-height:1.5;}
+.audio-gate-sub{font-size:10px;margin-top:10px;opacity:.65;letter-spacing:1px;line-height:1.6;}
+
 /* settings saved toast */
 .toast{
   position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(60px);
@@ -895,6 +913,18 @@ async function _ensureCtxRunning() {
   return ctx.state === 'running';
 }
 
+function _showAudioGate() {
+  const g = document.getElementById('audioGate');
+  if (g) g.style.display = 'flex';
+}
+
+async function unlockAudioGate() {
+  const g = document.getElementById('audioGate');
+  if (g) g.style.display = 'none';
+  initCtx();
+  try { await ctx.resume(); } catch(e) {}
+}
+
 // ══════════════════════════════════════
 // INDEXEDDB — armazena AudioBuffers
 // ══════════════════════════════════════
@@ -1478,18 +1508,18 @@ function generateHostCode(savedCode) {
       if (ev.type === 'note') {
         const el = document.querySelector('.npad[data-note="' + ev.name + '"]');
         if (el) ripple(el);
-        if (!await _ensureCtxRunning()) { showToast('CLIQUE NA TELA PARA ATIVAR O SOM'); return; }
+        if (!await _ensureCtxRunning()) { _showAudioGate(); return; }
         toggleNote(ev.name, el);
       } else if (ev.type === 'drum') {
         const pads = document.querySelectorAll('.dpad');
         const p = pads[ev.i];
         if (p) { ripple(p); p.classList.add('hit'); setTimeout(() => p.classList.remove('hit'), 130); }
-        if (!await _ensureCtxRunning()) { showToast('CLIQUE NA TELA PARA ATIVAR O SOM'); return; }
+        if (!await _ensureCtxRunning()) { _showAudioGate(); return; }
         DRUMS[ev.i].fn(ev.i);
       } else if (ev.type === 'param') {
         _applyParam(ev);
       } else if (ev.type === 'metro') {
-        if (!await _ensureCtxRunning()) return;
+        if (!await _ensureCtxRunning()) { _showAudioGate(); return; }
         _applyMetro(ev);
       }
     });
@@ -1611,6 +1641,8 @@ document.addEventListener('touchstart', async () => {
 // Desbloqueia AudioContext no primeiro clique do mouse (desktop sem gesto prévio)
 document.addEventListener('pointerdown', () => {
   if (ctx && ctx.state !== 'running') ctx.resume().catch(() => {});
+  const g = document.getElementById('audioGate');
+  if (g && g.style.display !== 'none') { g.style.display = 'none'; }
 }, { passive: true });
 
 const km={a:'C',w:'C#',s:'D',e:'D#',d:'E',f:'F',t:'F#',g:'G',y:'G#',h:'A',u:'A#',j:'B'};
@@ -1670,6 +1702,12 @@ startLoading();
   }
 })();
 </script>
+<div id="audioGate" class="audio-gate" style="display:none" onclick="unlockAudioGate()">
+  <div class="audio-gate-box">
+    <div class="audio-gate-title">CLIQUE AQUI PARA<br>ATIVAR O SOM</div>
+    <div class="audio-gate-sub">O celular está conectado.<br>Um clique é necessário para liberar o áudio.</div>
+  </div>
+</div>
 <div class="toast" id="toast"></div>
 </body>
 </html>
