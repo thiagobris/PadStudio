@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>PadStudio</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+/* ─── THEMES ─── */
+:root{
+  --bg:#0c0c1a; --bg2:#11112a;
+  --sur:rgba(255,255,255,0.055); --sur-h:rgba(255,255,255,0.09);
+  --bor:rgba(255,255,255,0.10);
+  --txt:#f0f0ff; --txt2:rgba(240,240,255,0.42);
+  --acc:#e8ff47; --acc2:#47ffb2;
+  --non-bg:rgba(232,255,71,0.13); --non-bor:#e8ff47; --non-gl:rgba(232,255,71,0.28); --non-col:#e8ff47;
+  --slbg:rgba(255,255,255,0.12); --thumb-sh:0 0 0 3px rgba(232,255,71,0.28);
+  --hbg:rgba(10,10,25,0.82);
+  --d1:linear-gradient(135deg,#9b1f5a,#601090);
+  --d2:linear-gradient(135deg,#b03040,#702888);
+  --d3:linear-gradient(135deg,#704888,#283878);
+  --d4:linear-gradient(135deg,#384870,#202860);
+  --d5:linear-gradient(135deg,#805828,#503880);
+  --d6:linear-gradient(135deg,#286880,#183868);
+  --d7:linear-gradient(135deg,#385878,#184858);
+  --d8:linear-gradient(135deg,#283850,#182840);
+}
+.t-light{
+  --bg:#f0f0f5; --bg2:#e6e6ee;
+  --sur:rgba(255,255,255,0.88); --sur-h:rgba(255,255,255,1);
+  --bor:rgba(0,0,0,0.08);
+  --txt:#1a1a2e; --txt2:rgba(26,26,46,0.42);
+  --acc:#5b5ef7; --acc2:#06b6d4;
+  --non-bg:rgba(91,94,247,0.11); --non-bor:#5b5ef7; --non-gl:rgba(91,94,247,0.22); --non-col:#5b5ef7;
+  --slbg:rgba(0,0,0,0.10); --thumb-sh:0 0 0 3px rgba(91,94,247,0.22);
+  --hbg:rgba(240,240,245,0.88);
+  --d1:linear-gradient(135deg,#f472b6,#a855f7);
+  --d2:linear-gradient(135deg,#e879a0,#818cf8);
+  --d3:linear-gradient(135deg,#a78bfa,#60a5fa);
+  --d4:linear-gradient(135deg,#67e8f9,#6366f1);
+  --d5:linear-gradient(135deg,#fb923c,#f472b6);
+  --d6:linear-gradient(135deg,#34d399,#60a5fa);
+  --d7:linear-gradient(135deg,#a3e635,#34d399);
+  --d8:linear-gradient(135deg,#facc15,#fb923c);
+}
+.t-dark{
+  --bg:#212121; --bg2:#2a2a2a;
+  --sur:rgba(255,255,255,0.05); --sur-h:rgba(255,255,255,0.09);
+  --bor:rgba(255,255,255,0.08);
+  --txt:#e6e6e6; --txt2:rgba(230,230,230,0.38);
+  --acc:#bdbdbd; --acc2:#888;
+  --non-bg:rgba(255,255,255,0.09); --non-bor:#fff; --non-gl:rgba(255,255,255,0.18); --non-col:#fff;
+  --slbg:rgba(255,255,255,0.10); --thumb-sh:0 0 0 3px rgba(200,200,200,0.22);
+  --hbg:rgba(28,28,28,0.88);
+  --d1:linear-gradient(135deg,#4a4a4a,#2e2e2e);
+  --d2:linear-gradient(135deg,#555,#353535);
+  --d3:linear-gradient(135deg,#484848,#303030);
+  --d4:linear-gradient(135deg,#404040,#282828);
+  --d5:linear-gradient(135deg,#525252,#323232);
+  --d6:linear-gradient(135deg,#464646,#2c2c2c);
+  --d7:linear-gradient(135deg,#3e3e3e,#282828);
+  --d8:linear-gradient(135deg,#363636,#222);
+}
+.t-fire{
+  --bg:#0f0400; --bg2:#180800;
+  --sur:rgba(255,100,20,0.07); --sur-h:rgba(255,100,20,0.12);
+  --bor:rgba(255,100,20,0.14);
+  --txt:#fff4e0; --txt2:rgba(255,244,224,0.40);
+  --acc:#ff7a1a; --acc2:#ffd447;
+  --non-bg:rgba(255,122,26,0.13); --non-bor:#ff7a1a; --non-gl:rgba(255,122,26,0.28); --non-col:#ff7a1a;
+  --slbg:rgba(255,100,20,0.14); --thumb-sh:0 0 0 3px rgba(255,122,26,0.25);
+  --hbg:rgba(12,4,0,0.88);
+  --d1:linear-gradient(135deg,#a02800,#601000);
+  --d2:linear-gradient(135deg,#b03010,#701800);
+  --d3:linear-gradient(135deg,#803818,#501020);
+  --d4:linear-gradient(135deg,#702818,#401010);
+  --d5:linear-gradient(135deg,#904808,#601808);
+  --d6:linear-gradient(135deg,#603818,#401010);
+  --d7:linear-gradient(135deg,#503020,#301008);
+  --d8:linear-gradient(135deg,#402818,#200c08);
+}
+.t-ocean{
+  --bg:#000c18; --bg2:#000f22;
+  --sur:rgba(0,140,255,0.07); --sur-h:rgba(0,140,255,0.12);
+  --bor:rgba(0,140,255,0.13);
+  --txt:#dff3ff; --txt2:rgba(223,243,255,0.38);
+  --acc:#00ccff; --acc2:#0044ff;
+  --non-bg:rgba(0,204,255,0.12); --non-bor:#00ccff; --non-gl:rgba(0,204,255,0.26); --non-col:#00ccff;
+  --slbg:rgba(0,140,255,0.13); --thumb-sh:0 0 0 3px rgba(0,204,255,0.22);
+  --hbg:rgba(0,8,18,0.88);
+  --d1:linear-gradient(135deg,#002878,#001050);
+  --d2:linear-gradient(135deg,#003890,#001468);
+  --d3:linear-gradient(135deg,#0048a0,#001c60);
+  --d4:linear-gradient(135deg,#004890,#001c58);
+  --d5:linear-gradient(135deg,#0058a0,#002860);
+  --d6:linear-gradient(135deg,#006890,#003058);
+  --d7:linear-gradient(135deg,#005070,#002840);
+  --d8:linear-gradient(135deg,#003858,#001c30);
+}
+.t-cosmic{
+  --bg:#070014; --bg2:#0e0022;
+  --sur:rgba(140,40,255,0.07); --sur-h:rgba(140,40,255,0.12);
+  --bor:rgba(140,40,255,0.14);
+  --txt:#eeddff; --txt2:rgba(238,221,255,0.38);
+  --acc:#cc44ff; --acc2:#7744ff;
+  --non-bg:rgba(204,68,255,0.12); --non-bor:#cc44ff; --non-gl:rgba(204,68,255,0.26); --non-col:#cc44ff;
+  --slbg:rgba(140,40,255,0.13); --thumb-sh:0 0 0 3px rgba(204,68,255,0.22);
+  --hbg:rgba(5,0,16,0.88);
+  --d1:linear-gradient(135deg,#580088,#300058);
+  --d2:linear-gradient(135deg,#680098,#380068);
+  --d3:linear-gradient(135deg,#4808a0,#280070);
+  --d4:linear-gradient(135deg,#381898,#180068);
+  --d5:linear-gradient(135deg,#5828a8,#281880);
+  --d6:linear-gradient(135deg,#383898,#181868);
+  --d7:linear-gradient(135deg,#2c3090,#141460);
+  --d8:linear-gradient(135deg,#202878,#101050);
+}
+
+/* ─── RESET ─── */
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--txt);font-family:'Syne',sans-serif;min-height:100vh;display:flex;flex-direction:column;transition:background .4s,color .4s;}
+
+/* ─── HEADER ─── */
+header{
+  background:var(--hbg);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--bor);
+  padding:14px 24px;
+  display:flex;align-items:center;gap:12px;
+  position:sticky;top:0;z-index:100;
+  flex-wrap:wrap;
+}
+.logo{font-family:'Space Mono',monospace;font-size:16px;font-weight:700;letter-spacing:3px;color:var(--acc);flex-shrink:0;}
+.logo b{color:var(--txt);}
+
+.hctr{display:flex;align-items:center;gap:12px;flex:1;justify-content:center;flex-wrap:wrap;}
+
+/* unified pill style */
+.hpill{
+  display:flex;align-items:center;gap:9px;
+  background:var(--sur);border:1px solid var(--bor);
+  border-radius:12px;padding:9px 16px;
+}
+.hl{font-size:11px;letter-spacing:1.5px;color:var(--txt2);font-family:'Space Mono',monospace;white-space:nowrap;}
+.hv{font-size:11px;font-family:'Space Mono',monospace;color:var(--acc);min-width:26px;text-align:right;}
+
+/* octave btns */
+.ob{background:none;border:none;color:var(--txt2);font-family:'Space Mono',monospace;font-size:12px;padding:4px 10px;border-radius:7px;cursor:pointer;transition:all .15s;}
+.ob.a{background:var(--acc);color:#000;}
+
+/* crossfade slider */
+input.cf{
+  -webkit-appearance:none;appearance:none;
+  width:90px;height:4px;border-radius:2px;
+  background:var(--slbg);outline:none;cursor:pointer;
+}
+input.cf::-webkit-slider-thumb{-webkit-appearance:none;width:17px;height:17px;border-radius:50%;background:var(--acc);cursor:pointer;box-shadow:var(--thumb-sh);}
+
+/* status */
+.sd{width:8px;height:8px;border-radius:50%;background:var(--txt2);transition:all .15s;flex-shrink:0;}
+.sd.on{background:var(--acc);box-shadow:0 0 7px var(--acc);animation:blink .5s;}
+@keyframes blink{0%{transform:scale(2.2);opacity:.3}100%{transform:scale(1);opacity:1}}
+.stxt{font-size:11px;font-family:'Space Mono',monospace;color:var(--txt2);white-space:nowrap;}
+.hpill-status{width:148px;justify-content:center;}
+
+/* icon btns */
+.hbtns{display:flex;gap:8px;flex-shrink:0;}
+.hb{
+  background:var(--sur);border:1px solid var(--bor);
+  border-radius:11px;width:42px;height:42px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;color:var(--txt2);
+  transition:all .2s;user-select:none;
+}
+.hb:hover{color:var(--acc);border-color:var(--acc);}
+.hb.on{color:var(--acc2);border-color:var(--acc2);background:rgba(71,255,178,0.09);}
+
+/* ─── MAIN ─── */
+main{
+  flex:1;
+  display:grid;
+  grid-template-columns:210px 1fr;
+  gap:20px;
+  padding:28px 24px;
+  max-width:1160px;
+  margin:0 auto;
+  width:100%;
+}
+
+/* ─── LEFT: NOTES ─── */
+.lcol{display:flex;flex-direction:column;gap:16px;height:100%;}
+
+.ngrid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;}
+
+.npad{
+  background:var(--sur);border:1px solid var(--bor);
+  backdrop-filter:blur(8px);border-radius:13px;
+  height:68px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;
+  font-family:'Space Mono',monospace;font-size:14px;font-weight:700;
+  color:var(--txt);letter-spacing:1px;
+  transition:background .18s,border-color .18s,box-shadow .18s,transform .09s;
+  user-select:none;position:relative;overflow:hidden;
+}
+.npad:hover{background:var(--sur-h);}
+.npad.on{
+  background:var(--non-bg);border-color:var(--non-bor);
+  color:var(--non-col);box-shadow:0 0 18px var(--non-gl);
+}
+.npad.on::after{
+  content:'';position:absolute;bottom:5px;left:50%;transform:translateX(-50%);
+  width:5px;height:5px;border-radius:50%;
+  background:var(--non-bor);box-shadow:0 0 6px var(--non-bor);
+}
+.npad.loaded{
+  border-color:rgba(255,255,255,0.22);
+}
+.npad.loaded::before{
+  content:'';position:absolute;top:5px;right:5px;
+  width:5px;height:5px;border-radius:50%;
+  background:var(--acc2);opacity:0.7;
+}
+.npad.loading{
+  opacity:0.55;
+}
+
+/* settings saved toast */
+.toast{
+  position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(60px);
+  background:var(--acc);color:#000;
+  font-family:'Space Mono',monospace;font-size:11px;letter-spacing:1px;
+  padding:8px 20px;border-radius:20px;
+  transition:transform .3s;z-index:999;pointer-events:none;
+}
+.toast.show{transform:translateX(-50%) translateY(0);}
+
+/* note info */
+.ninfo{
+  background:var(--sur);border:1px solid var(--bor);
+  border-radius:16px;padding:18px 20px;
+  display:flex;flex-direction:column;gap:4px;
+}
+.ni-lbl{font-size:10px;letter-spacing:2px;color:var(--txt2);font-family:'Space Mono',monospace;}
+.ni-tom{font-size:30px;font-weight:800;color:var(--acc);font-family:'Space Mono',monospace;line-height:1.1;margin:4px 0 6px;}
+.ni-kit{font-size:12px;letter-spacing:1px;color:var(--txt2);font-family:'Space Mono',monospace;}
+
+/* note master */
+.nmvol{
+  background:var(--sur);border:1px solid var(--bor);
+  border-radius:16px;padding:20px 22px;
+}
+.vol-lbl{font-size:11px;letter-spacing:1.5px;color:var(--txt2);font-family:'Space Mono',monospace;margin-bottom:16px;}
+.vrow{display:flex;align-items:center;gap:12px;min-width:0;}.vrow .cs{min-width:0;flex:1;}
+.vlbl{font-size:11px;font-family:'Space Mono',monospace;color:var(--txt2);width:44px;flex-shrink:0;}
+.vpct{font-size:12px;font-family:'Space Mono',monospace;color:var(--acc);width:38px;text-align:right;flex-shrink:0;white-space:nowrap;}
+
+/* ─── CUSTOM SLIDER ─── */
+input.cs{
+  -webkit-appearance:none;appearance:none;
+  flex:1;height:6px;border-radius:3px;outline:none;cursor:pointer;
+  background:linear-gradient(to right, var(--acc) var(--p,80%), var(--slbg) var(--p,80%));
+  transition:background .1s;
+}
+input.cs::-webkit-slider-thumb{
+  -webkit-appearance:none;
+  width:22px;height:22px;border-radius:50%;
+  background:var(--acc);cursor:pointer;
+  box-shadow:var(--thumb-sh);
+  border:3px solid var(--bg);
+  transition:transform .1s;
+}
+input.cs::-webkit-slider-thumb:hover{transform:scale(1.12);}
+input.cs::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:var(--acc);cursor:pointer;border:3px solid var(--bg);}
+
+/* ─── RIGHT: DRUMS ─── */
+.rcol{display:flex;flex-direction:column;gap:16px;}
+
+.dgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+
+.dpad{
+  border-radius:16px;
+  height:130px;
+  display:flex;flex-direction:column;
+  align-items:flex-start;justify-content:flex-end;
+  padding:14px 16px;
+  cursor:pointer;
+  position:relative;overflow:hidden;
+  transition:transform .1s,filter .12s;
+  user-select:none;
+  border:1px solid rgba(255,255,255,0.06);
+}
+.dpad:nth-child(1){background:var(--d1);}
+.dpad:nth-child(2){background:var(--d2);}
+.dpad:nth-child(3){background:var(--d3);}
+.dpad:nth-child(4){background:var(--d4);}
+.dpad:nth-child(5){background:var(--d5);}
+.dpad:nth-child(6){background:var(--d6);}
+.dpad:nth-child(7){background:var(--d7);}
+.dpad:nth-child(8){background:var(--d8);}
+.dpad:hover{filter:brightness(1.15);}
+.dpad.hit{transform:scale(0.92);filter:brightness(1.35);}
+.dpad-gl{position:absolute;inset:0;background:rgba(255,255,255,0);transition:background .1s;}
+.dpad.hit .dpad-gl{background:rgba(255,255,255,0.12);}
+.dpad-name{font-size:14px;font-weight:700;color:#fff;letter-spacing:.3px;position:relative;z-index:1;text-shadow:0 1px 4px rgba(0,0,0,0.25);}
+.dpad-sub{font-size:10px;color:rgba(255,255,255,0.45);letter-spacing:.4px;margin-top:3px;position:relative;z-index:1;}
+
+/* ─── DRUM VOLUMES ─── */
+.dvols{
+  background:var(--sur);border:1px solid var(--bor);
+  border-radius:16px;padding:20px 22px;
+  display:flex;flex-direction:column;gap:18px;
+}
+.dv-master-row{
+  display:flex;align-items:center;gap:12px;
+  padding-bottom:16px;
+  border-bottom:1px solid var(--bor);
+}
+.dv-master-lbl{
+  font-size:11px;font-family:'Space Mono',monospace;
+  color:var(--txt2);letter-spacing:1.5px;width:90px;flex-shrink:0;
+}
+.dv-master-pct{font-size:12px;font-family:'Space Mono',monospace;color:var(--acc);width:38px;text-align:right;flex-shrink:0;}
+
+.dv-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px 22px;}
+
+.dv-item{display:flex;flex-direction:column;gap:8px;}
+.dv-name{font-size:12px;font-weight:700;color:var(--txt);font-family:'Space Mono',monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.dv-sub{font-size:9px;color:var(--txt2);letter-spacing:.5px;font-family:'Space Mono',monospace;}
+.dv-row{display:flex;align-items:center;gap:7px;min-width:0;}
+.dv-pct{font-size:11px;font-family:'Space Mono',monospace;color:var(--acc);width:34px;text-align:right;flex-shrink:0;}
+.dv-row .cs{min-width:0;flex:1;}
+
+/* ─── RIPPLE ─── */
+.rpl{position:absolute;border-radius:50%;background:rgba(255,255,255,0.18);transform:scale(0);animation:rA .5s linear;pointer-events:none;z-index:10;}
+@keyframes rA{to{transform:scale(5);opacity:0}}
+
+/* ─── OVERLAY / PANEL ─── */
+.ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:200;backdrop-filter:blur(14px);align-items:center;justify-content:center;}
+.ov.open{display:flex;}
+.panel{
+  background:var(--bg2);border:1px solid var(--bor);
+  border-radius:26px;padding:28px 28px 24px;
+  width:92%;max-width:460px;
+  animation:pop .25s cubic-bezier(.34,1.56,.64,1);
+  max-height:90vh;overflow-y:auto;
+}
+@keyframes pop{from{transform:scale(.85);opacity:0}to{transform:scale(1);opacity:1}}
+.phd{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;}
+.ptit{font-size:18px;font-weight:800;letter-spacing:.3px;}
+.phd-actions{display:flex;gap:8px;align-items:center;}
+.pcls,.prst{
+  width:32px;height:32px;border-radius:50%;
+  background:var(--sur);border:1px solid var(--bor);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;color:var(--txt2);font-size:13px;
+  transition:all .2s;
+}
+.pcls:hover{color:var(--txt);background:var(--sur-h);}
+.prst:hover{border-color:var(--acc);color:var(--acc);}
+.pg{
+  font-size:9px;letter-spacing:3px;color:var(--txt2);
+  font-family:'Space Mono',monospace;text-transform:uppercase;
+  margin:22px 0 14px;
+  display:flex;align-items:center;gap:10px;
+}
+.pg::after{content:'';flex:1;height:1px;background:var(--bor);}
+.srow{display:flex;align-items:center;gap:12px;margin-bottom:18px;}
+.sl{font-size:11px;font-family:'Space Mono',monospace;color:var(--txt2);width:52px;flex-shrink:0;}
+.sv{font-size:12px;font-family:'Space Mono',monospace;color:var(--acc);width:42px;text-align:right;flex-shrink:0;font-weight:700;}
+
+/* ─── METRO ─── */
+.metro-icon{display:flex;justify-content:center;margin-bottom:4px;}
+.bpmnum{text-align:center;font-size:54px;font-family:'Space Mono',monospace;font-weight:700;color:var(--acc);letter-spacing:-2px;margin:6px 0 2px;}
+.bpmunit{text-align:center;font-size:9px;color:var(--txt2);letter-spacing:3px;margin-bottom:8px;font-family:'Space Mono',monospace;}
+.brow{display:flex;align-items:center;gap:7px;margin:8px 0;}
+.mbtn{background:var(--sur);border:1px solid var(--bor);border-radius:9px;padding:7px 14px;color:var(--txt);font-family:'Space Mono',monospace;font-size:16px;cursor:pointer;transition:all .15s;flex-shrink:0;}
+.mbtn:hover{background:var(--sur-h);}
+.crow{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0;}
+.cbtn{background:var(--sur);border:1px solid var(--bor);border-radius:8px;padding:6px 14px;color:var(--txt2);font-family:'Space Mono',monospace;font-size:11px;cursor:pointer;transition:all .15s;}
+.cbtn.a{background:var(--non-bg);border-color:var(--acc);color:var(--acc);}
+.beatrow{display:flex;gap:9px;justify-content:center;margin:14px 0 6px;}
+.bdot{width:12px;height:12px;border-radius:50%;background:var(--slbg);transition:all .06s;}
+.bdot.on{background:var(--acc);box-shadow:0 0 10px var(--non-gl);}
+.bdot.str{width:17px;height:17px;}
+.mplay{width:100%;padding:12px;border-radius:12px;background:var(--non-bg);border:1px solid var(--acc);color:var(--acc);font-family:'Space Mono',monospace;font-size:12px;letter-spacing:2px;cursor:pointer;transition:all .2s;margin-top:12px;}
+.mplay:hover{filter:brightness(1.1);}
+.mplay.run{background:rgba(255,71,71,0.09);border-color:#ff4747;color:#ff4747;}
+
+/* ─── THEMES ─── */
+.tgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.tc{
+  background:var(--sur);border:2px solid var(--bor);
+  border-radius:18px;overflow:hidden;cursor:pointer;
+  transition:border-color .25s,transform .18s,box-shadow .25s;
+  position:relative;
+}
+.tc:hover{transform:scale(1.025);border-color:rgba(255,255,255,0.18);}
+.tc.a{border-color:var(--acc);box-shadow:0 0 22px var(--non-gl);}
+.tc-thumb{
+  height:76px;width:100%;position:relative;overflow:hidden;
+}
+.tc-thumb::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(to bottom,transparent 30%,rgba(0,0,0,0.55));
+}
+.tc-dots{position:absolute;bottom:10px;left:13px;display:flex;gap:7px;z-index:1;}
+.tc-dot{width:14px;height:14px;border-radius:50%;border:1.5px solid rgba(255,255,255,0.18);}
+.tc-check{
+  position:absolute;top:9px;right:10px;z-index:1;
+  width:22px;height:22px;border-radius:50%;
+  background:var(--acc);
+  display:none;align-items:center;justify-content:center;
+  box-shadow:0 0 10px var(--non-gl);
+}
+.tc.a .tc-check{display:flex;}
+.tc-info{padding:12px 14px 13px;}
+.tc-name{font-size:13px;font-weight:800;letter-spacing:.4px;}
+.tc-desc{font-size:9px;color:var(--txt2);margin-top:3px;letter-spacing:.4px;}
+
+/* ─── RESPONSIVE ─── */
+@media(max-width:720px){
+  main{grid-template-columns:1fr;padding:20px 16px;}
+  .dgrid{grid-template-columns:repeat(4,1fr);}
+  .dv-grid{grid-template-columns:repeat(2,1fr);}
+  .hpill{padding:8px 12px;}
+  .hctr{gap:8px;}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">PAD<b>STUDIO</b></div>
+
+  <div class="hctr">
+    <!-- CROSSFADE -->
+    <div class="hpill">
+      <span class="hl">CROSSFADE</span>
+      <input class="cf" id="cfsl" type="range" min="0" max="10" step="1" value="0"
+             oninput="cf=+this.value;document.getElementById('cfv').textContent=this.value+'s';autoSave()">
+      <span class="hv" id="cfv">0s</span>
+    </div>
+
+    <!-- STATUS -->
+    <div class="hpill hpill-status">
+      <div class="sd" id="sd"></div>
+      <span class="stxt" id="stxt">PARADO</span>
+    </div>
+  </div>
+
+  <div class="hbtns">
+    <div class="hb" id="mhb" title="Metrônomo" onclick="openOv('metro')">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M10 2L18 19H2L10 2Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+        <line x1="10" y1="19" x2="10" y2="7" stroke="currentColor" stroke-width="1.5"/>
+        <line id="pendulum" x1="10" y1="7" x2="15" y2="13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="10" cy="19" r="1.5" fill="currentColor"/>
+      </svg>
+    </div>
+    <div class="hb" title="Configurações" onclick="openOv('cfg')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="hb" title="Temas" onclick="openOv('themes')">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M10 2a8 8 0 0 0 0 16V2z" fill="currentColor"/>
+        <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.7"/>
+      </svg>
+    </div>
+  </div>
+</header>
+
+<!-- MAIN -->
+<main>
+
+  <!-- LEFT -->
+  <div class="lcol">
+    <div class="ngrid" id="ng"></div>
+
+    <div class="ninfo">
+      <span class="ni-lbl">TOM ATUAL</span>
+      <div class="ni-tom" id="niTom">—</div>
+      <div class="ni-kit" id="niKit">PAD 1</div>
+    </div>
+
+    <div class="nmvol">
+      <div class="vol-lbl">VOLUME MASTER</div>
+      <div class="vrow" style="margin-top:10px">
+        <input class="cs" id="noteMasterSl" type="range" min="0" max="100" value="80" style="--p:80%"
+               oninput="sp(this);noteMV=this.value/100;if(noteMasterG)noteMasterG.gain.value=noteMV;document.getElementById('nmpct').textContent=this.value+'%';autoSave()">
+        <span class="vpct" id="nmpct">80%</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="rcol">
+    <div class="dgrid" id="dg"></div>
+
+    <div class="dvols">
+      <!-- master drum -->
+      <div class="dv-master-row">
+        <span class="dv-master-lbl">VOLUME — BATERIA</span>
+        <input class="cs" id="drumMasterSl" type="range" min="0" max="100" value="80" style="--p:80%;flex:1"
+               oninput="sp(this);drumMV=this.value/100;document.getElementById('dmpct').textContent=this.value+'%';autoSave()">
+        <span class="dv-master-pct" id="dmpct">80%</span>
+      </div>
+      <!-- individual drum vols -->
+      <div class="dv-grid" id="dv"></div>
+    </div>
+  </div>
+
+</main>
+
+<!-- SETTINGS -->
+<div class="ov" id="cfgOv" onclick="closeOv('cfg')">
+ <div class="panel" onclick="event.stopPropagation()">
+  <div class="phd">
+   <span class="ptit">Configurações</span>
+   <div class="phd-actions">
+    <button class="prst" onclick="resetSettings()" title="Restaurar padrões">
+     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M3 3v5h5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+     </svg>
+    </button>
+    <div class="pcls" onclick="closeOv('cfg')">✕</div>
+   </div>
+  </div>
+  <div class="pg">Volume Geral</div>
+  <div class="srow"><span class="sl">Master</span><input id="cfg0" class="cs" type="range" min="0" max="100" value="80" style="--p:80%" oninput="sp(this);CS(0,this.value)"><span class="sv" id="sv0">80%</span></div>
+  <div class="srow"><span class="sl">Pan</span><input id="cfg1" class="cs" type="range" min="0" max="100" value="50" style="--p:50%" oninput="sp(this);CS(1,this.value)"><span class="sv" id="sv1">C</span></div>
+  <div class="pg">Filtros</div>
+  <div class="srow"><span class="sl">Cutoff</span><input id="cfg2" class="cs" type="range" min="0" max="100" value="70" style="--p:70%" oninput="sp(this);CS(2,this.value)"><span class="sv" id="sv2">8.4k</span></div>
+  <div class="srow"><span class="sl">HPF</span><input id="cfg3" class="cs" type="range" min="0" max="100" value="5" style="--p:5%" oninput="sp(this);CS(3,this.value)"><span class="sv" id="sv3">40Hz</span></div>
+  <div class="pg">Reverb</div>
+  <div class="srow"><span class="sl">Mix</span><input id="cfg4" class="cs" type="range" min="0" max="100" value="25" style="--p:25%" oninput="sp(this);CS(4,this.value)"><span class="sv" id="sv4">25%</span></div>
+ </div>
+</div>
+
+<!-- METRO -->
+<div class="ov" id="metroOv" onclick="closeOv('metro')">
+ <div class="panel" onclick="event.stopPropagation()">
+  <div class="phd"><span class="ptit">Metrônomo</span><div class="phd-actions"><div class="pcls" onclick="closeOv('metro')">✕</div></div></div>
+
+  <!-- SVG metrônomo decorativo -->
+  <div class="metro-icon">
+   <svg width="48" height="56" viewBox="0 0 48 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M24 3L44 52H4L24 3Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round" opacity=".4"/>
+    <line x1="24" y1="52" x2="24" y2="14" stroke="currentColor" stroke-width="1.5" opacity=".3"/>
+    <line id="pend" x1="24" y1="14" x2="36" y2="32" stroke="var(--acc)" stroke-width="2.5" stroke-linecap="round"/>
+    <circle cx="24" cy="52" r="3" fill="currentColor" opacity=".5"/>
+    <circle cx="36" cy="32" r="3" fill="var(--acc)" opacity=".8"/>
+   </svg>
+  </div>
+
+  <div class="bpmnum" id="bdisp">120</div>
+  <div class="bpmunit">BPM</div>
+
+  <div class="brow">
+    <button class="mbtn" onclick="chBPM(-10)">−10</button>
+    <button class="mbtn" onclick="chBPM(-1)">−1</button>
+    <input class="cs" id="bsl" type="range" min="40" max="240" value="120" style="--p:40%" oninput="sp(this);setBPM(+this.value)">
+    <button class="mbtn" onclick="chBPM(1)">+1</button>
+    <button class="mbtn" onclick="chBPM(10)">+10</button>
+  </div>
+
+  <div class="pg">Compasso</div>
+  <div class="crow">
+    <button class="cbtn" onclick="setComp(2,this)">2/4</button>
+    <button class="cbtn" onclick="setComp(3,this)">3/4</button>
+    <button class="cbtn a" onclick="setComp(4,this)">4/4</button>
+    <button class="cbtn" onclick="setComp(6,this)">6/8</button>
+  </div>
+  <div class="beatrow" id="beatrow"></div>
+
+  <div class="pg">Volume do Click</div>
+  <div class="srow">
+    <span class="sl">Click</span>
+    <input class="cs" type="range" min="0" max="100" value="70" style="--p:70%" oninput="sp(this);metVol=this.value/100;document.getElementById('cvv').textContent=this.value+'%'">
+    <span class="sv" id="cvv">70%</span>
+  </div>
+  <button class="mplay" id="mplaybtn" onclick="togMetro()">▶  INICIAR</button>
+ </div>
+</div>
+
+<!-- THEMES -->
+<div class="ov" id="themesOv" onclick="closeOv('themes')">
+ <div class="panel" onclick="event.stopPropagation()">
+  <div class="phd"><span class="ptit">Temas</span><div class="phd-actions"><div class="pcls" onclick="closeOv('themes')">✕</div></div></div>
+  <div class="tgrid">
+
+   <div class="tc a" id="t-" onclick="setTheme('')">
+    <div class="tc-thumb" style="background:linear-gradient(135deg,#0c0c1a,#1a1a40,#0c1a2e)">
+     <div class="tc-check"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+     <div class="tc-dots"><div class="tc-dot" style="background:#e8ff47;box-shadow:0 0 8px #e8ff47"></div><div class="tc-dot" style="background:#47ffb2;box-shadow:0 0 8px #47ffb2"></div></div>
+    </div>
+    <div class="tc-info"><div class="tc-name">Neon Dark</div><div class="tc-desc">preto · amarelo neon · padrão</div></div>
+   </div>
+
+   <div class="tc" id="t-light" onclick="setTheme('light')">
+    <div class="tc-thumb" style="background:linear-gradient(135deg,#c8c8e0,#e8e8f4,#d0d0ea)">
+     <div class="tc-check"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+     <div class="tc-dots"><div class="tc-dot" style="background:#5b5ef7;box-shadow:0 0 8px #5b5ef7"></div><div class="tc-dot" style="background:#06b6d4;box-shadow:0 0 8px #06b6d4"></div></div>
+    </div>
+    <div class="tc-info"><div class="tc-name">Light</div><div class="tc-desc">branco · violeta · ciano</div></div>
+   </div>
+
+   <div class="tc" id="t-dark" onclick="setTheme('dark')">
+    <div class="tc-thumb" style="background:linear-gradient(135deg,#1a1a1a,#2e2e2e,#222)">
+     <div class="tc-check"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+     <div class="tc-dots"><div class="tc-dot" style="background:#bdbdbd"></div><div class="tc-dot" style="background:#777"></div></div>
+    </div>
+    <div class="tc-info"><div class="tc-name">Escuro</div><div class="tc-desc">neutro · cinza puro</div></div>
+   </div>
+
+   <div class="tc" id="t-fire" onclick="setTheme('fire')">
+    <div class="tc-thumb" style="background:linear-gradient(135deg,#0f0400,#3a0800,#1a0200)">
+     <div class="tc-check"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+     <div class="tc-dots"><div class="tc-dot" style="background:#ff7a1a;box-shadow:0 0 8px #ff7a1a"></div><div class="tc-dot" style="background:#ffd447;box-shadow:0 0 8px #ffd447"></div></div>
+    </div>
+    <div class="tc-info"><div class="tc-name">Fire</div><div class="tc-desc">preto · laranja · fogo</div></div>
+   </div>
+
+   <div class="tc" id="t-ocean" onclick="setTheme('ocean')">
+    <div class="tc-thumb" style="background:linear-gradient(135deg,#000c18,#002040,#001028)">
+     <div class="tc-check"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+     <div class="tc-dots"><div class="tc-dot" style="background:#00ccff;box-shadow:0 0 8px #00ccff"></div><div class="tc-dot" style="background:#0044ff;box-shadow:0 0 8px #0044ff"></div></div>
+    </div>
+    <div class="tc-info"><div class="tc-name">Ocean</div><div class="tc-desc">preto · ciano · azul</div></div>
+   </div>
+
+   <div class="tc" id="t-cosmic" onclick="setTheme('cosmic')">
+    <div class="tc-thumb" style="background:linear-gradient(135deg,#070014,#200050,#0e0030)">
+     <div class="tc-check"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+     <div class="tc-dots"><div class="tc-dot" style="background:#cc44ff;box-shadow:0 0 8px #cc44ff"></div><div class="tc-dot" style="background:#7744ff;box-shadow:0 0 8px #7744ff"></div></div>
+    </div>
+    <div class="tc-info"><div class="tc-name">Cosmic</div><div class="tc-desc">preto · roxo · espacial</div></div>
+   </div>
+
+  </div>
+ </div>
+</div>
+
+<script>
+// ══════════════════════════════════════
+// INDEXEDDB — armazena AudioBuffers
+// ══════════════════════════════════════
+let db;
+function openDB() {
+  return new Promise((res, rej) => {
+    const req = indexedDB.open('PadStudio', 1);
+    req.onupgradeneeded = e => e.target.result.createObjectStore('audio');
+    req.onsuccess = e => { db = e.target.result; res(db); };
+    req.onerror = () => rej();
+  });
+}
+function dbSet(key, val) {
+  return new Promise(res => {
+    const tx = db.transaction('audio','readwrite');
+    tx.objectStore('audio').put(val, key);
+    tx.oncomplete = res;
+  });
+}
+function dbGet(key) {
+  return new Promise(res => {
+    const tx = db.transaction('audio','readonly');
+    const req = tx.objectStore('audio').get(key);
+    req.onsuccess = () => res(req.result);
+    req.onerror = () => res(null);
+  });
+}
+
+// ══════════════════════════════════════
+// LOCALSTORAGE — salva configurações
+// ══════════════════════════════════════
+function saveSettings() {
+  const data = {
+    noteMV, drumMV, cf: cf,
+    oct, drumVols: [...drumVols],
+    theme: document.body.className || ''
+  };
+  localStorage.setItem('padstudio_settings', JSON.stringify(data));
+  showToast('SALVO');
+}
+
+function loadSettings() {
+  try {
+    const raw = localStorage.getItem('padstudio_settings');
+    if (!raw) return;
+    const d = JSON.parse(raw);
+    if (d.noteMV !== undefined) noteMV = d.noteMV;
+    if (d.drumMV !== undefined) drumMV = d.drumMV;
+    if (d.cf    !== undefined) cf     = d.cf;
+    if (d.oct   !== undefined) oct    = d.oct;
+    if (d.drumVols) d.drumVols.forEach((v,i) => drumVols[i] = v);
+    if (d.theme) { document.body.className = d.theme; }
+
+    // apply to UI after DOM built
+    requestAnimationFrame(() => {
+      // note master slider
+      const nms = document.getElementById('noteMasterSl');
+      if (nms) { nms.value = Math.round(noteMV*100); sp(nms); document.getElementById('nmpct').textContent = Math.round(noteMV*100)+'%'; }
+      // drum master
+      const dms = document.getElementById('drumMasterSl');
+      if (dms) { dms.value = Math.round(drumMV*100); sp(dms); document.getElementById('dmpct').textContent = Math.round(drumMV*100)+'%'; }
+      // crossfade
+      const cfs = document.getElementById('cfsl');
+      if (cfs) { cfs.value = cf; document.getElementById('cfv').textContent = cf+'s'; }
+      // octave
+      document.querySelectorAll('.ob').forEach(b => b.classList.toggle('a', +b.textContent === oct));
+      // drum individual vols
+      drumVols.forEach((v,i) => {
+        const sl = document.getElementById('dsl'+i);
+        const pct = document.getElementById('dp'+i);
+        if (sl) { sl.value = Math.round(v*100); sp(sl); }
+        if (pct) pct.textContent = Math.round(v*100)+'%';
+      });
+      // theme
+      if (d.theme) {
+        document.querySelectorAll('.tc').forEach(c => c.classList.remove('a'));
+        const tid = 't-' + d.theme.replace('t-','');
+        const el = document.getElementById(tid) || document.getElementById('t-');
+        if (el) el.classList.add('a');
+      }
+    });
+  } catch(e) {}
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 1400);
+}
+
+// auto-save on any slider change (debounced)
+let saveTimer;
+function autoSave() { clearTimeout(saveTimer); saveTimer = setTimeout(saveSettings, 800); }
+
+// ══════════════════════════════════════
+// AUDIO ENGINE
+// ══════════════════════════════════════
+let ctx, masterG, panN, lpF, hpF, revG, dryG, noteMasterG;
+let noteMV = 0.8, drumMV = 0.8;
+const drumGains = [];
+
+function initCtx() {
+  if (ctx) return;
+  ctx = new (window.AudioContext || window.webkitAudioContext)();
+
+  masterG     = ctx.createGain();         masterG.gain.value     = 0.8;
+  noteMasterG = ctx.createGain();         noteMasterG.gain.value = noteMV;
+  panN        = ctx.createStereoPanner(); panN.pan.value         = 0;
+  lpF         = ctx.createBiquadFilter(); lpF.type = 'lowpass';  lpF.frequency.value = 8400;
+  hpF         = ctx.createBiquadFilter(); hpF.type = 'highpass'; hpF.frequency.value = 40;
+  revG        = ctx.createGain();         revG.gain.value        = 0.25;
+  dryG        = ctx.createGain();         dryG.gain.value        = 0.75;
+
+  const rate = ctx.sampleRate, len = rate * 2;
+  const ibuf = ctx.createBuffer(2, len, rate);
+  for (let c = 0; c < 2; c++) {
+    const d = ibuf.getChannelData(c);
+    for (let i = 0; i < len; i++) d[i] = (Math.random()*2-1)*Math.pow(1-i/len,8);
+  }
+  const conv = ctx.createConvolver(); conv.buffer = ibuf;
+
+  noteMasterG.connect(lpF);
+  lpF.connect(hpF);
+  hpF.connect(dryG); hpF.connect(conv);
+  conv.connect(revG);
+  dryG.connect(masterG); revG.connect(masterG);
+  masterG.connect(panN); panN.connect(ctx.destination);
+
+  DRUMS.forEach((_, i) => {
+    const g = ctx.createGain(); g.gain.value = drumVols[i];
+    g.connect(lpF);
+    drumGains[i] = g;
+  });
+}
+
+// ── NOTAS ──
+const NOTES = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+const activeN = {};          // { k: { src?, osc1?, osc2?, g } }
+const noteBuffers = {};      // { noteName: AudioBuffer }
+let oct = 4, cf = 0;
+const drumVols = Array(8).fill(0.8);
+
+function nfreq(n, o) {
+  const s = {C:0,'C#':1,D:2,'D#':3,E:4,F:5,'F#':6,G:7,'G#':8,A:9,'A#':10,B:11};
+  return 440 * Math.pow(2, (o-4+(s[n]-9)/12));
+}
+
+function toggleNote(name, el) {
+  initCtx();
+  const k = name + oct;
+  if (activeN[k]) {
+    stopNote(k, el);
+  } else {
+    // crossfade: stop outros
+    Object.keys(activeN).forEach(k2 => {
+      stopNote(k2, document.querySelector(`.npad[data-note="${k2.slice(0,-1)}"]`));
+    });
+    startNote(name, oct, el);
+  }
+}
+
+function startNote(name, o, el) {
+  const k = name + o;
+  const g = ctx.createGain();
+  const now = ctx.currentTime, fi = Math.max(cf, 0.01);
+  g.gain.setValueAtTime(0.0001, now);
+  g.gain.linearRampToValueAtTime(0.45, now + fi);
+  g.connect(noteMasterG);
+
+  const buf = noteBuffers[name];
+  if (buf) {
+    // usa o arquivo de áudio carregado — loop infinito
+    const src = ctx.createBufferSource();
+    src.buffer = buf;
+    src.loop = true;
+    src.connect(g);
+    src.start();
+    activeN[k] = { src, g };
+  } else {
+    // fallback: oscilador sintetizado
+    const o1 = ctx.createOscillator(), o2 = ctx.createOscillator();
+    o1.type = 'triangle'; o1.frequency.value = nfreq(name, o);
+    o2.type = 'sine';     o2.frequency.value = nfreq(name, o) * 1.003;
+    o1.connect(g); o2.connect(g);
+    o1.start(); o2.start();
+    activeN[k] = { o1, o2, g };
+  }
+
+  if (el) { el.classList.add('on'); el.dataset.k = k; }
+  document.getElementById('niTom').textContent = name;
+  setSt(name + o);
+}
+
+function stopNote(k, el) {
+  const nd = activeN[k]; if (!nd) return;
+  const { src, o1, o2, g } = nd;
+  const now = ctx.currentTime, fo = Math.max(cf, 0.05);
+  g.gain.cancelScheduledValues(now);
+  g.gain.setValueAtTime(g.gain.value, now);
+  g.gain.linearRampToValueAtTime(0.0001, now + fo);
+  const stopAt = now + fo + 0.05;
+  if (src) try { src.stop(stopAt); } catch(e) {}
+  if (o1)  try { o1.stop(stopAt); o2.stop(stopAt); } catch(e) {}
+  delete activeN[k];
+  if (el) el.classList.remove('on');
+  if (!Object.keys(activeN).length) {
+    setSt('PARADO', false);
+    document.getElementById('niTom').textContent = '—';
+  }
+}
+
+// ── CARREGAR ÁUDIO ──
+async function loadAudioFile(name, file, padEl) {
+  initCtx();
+  try {
+    const arrayBuf = await file.arrayBuffer();
+    const audioBuf = await ctx.decodeAudioData(arrayBuf);
+    noteBuffers[name] = audioBuf;
+    padEl.classList.add('loaded');
+    // salva no IndexedDB como ArrayBuffer
+    await dbSet('note_' + name, arrayBuf);
+    showToast(name + ' CARREGADO');
+  } catch(e) {
+    showToast('ERRO AO CARREGAR');
+    console.error(e);
+  }
+}
+
+// Mapa de nota → arquivo de áudio
+const NOTE_FILES = {
+  'C':'audio/C.flac','C#':'audio/Cs.flac',
+  'D':'audio/D.flac','D#':'audio/Ds.flac',
+  'E':'audio/E.flac',
+  'F':'audio/F.flac','F#':'audio/Fs.flac',
+  'G':'audio/G.flac','G#':'audio/Gs.flac',
+  'A':'audio/A.flac','A#':'audio/As.flac',
+  'B':'audio/B.flac'
+};
+
+async function loadSavedAudios() {
+  await openDB();
+
+  // marca todos como "carregando"
+  NOTES.forEach(n => {
+    const el = document.querySelector(`.npad[data-note="${n}"]`);
+    if (el) el.classList.add('loading');
+  });
+
+  for (const name of NOTES) {
+    const padEl = document.querySelector(`.npad[data-note="${name}"]`);
+
+    // 1º tenta cache do IndexedDB
+    let raw = await dbGet('note_' + name);
+
+    // 2º se não tem cache, carrega do arquivo
+    if (!raw && NOTE_FILES[name]) {
+      try {
+        const res = await fetch(NOTE_FILES[name]);
+        if (res.ok) raw = await res.arrayBuffer();
+        if (raw) await dbSet('note_' + name, raw); // salva no cache
+      } catch(e) {}
+    }
+
+    if (!raw) {
+      if (padEl) padEl.classList.remove('loading');
+      continue;
+    }
+
+    try {
+      initCtx();
+      const audioBuf = await ctx.decodeAudioData(raw.slice ? raw.slice(0) : raw.slice(0));
+      noteBuffers[name] = audioBuf;
+      if (padEl) { padEl.classList.remove('loading'); padEl.classList.add('loaded'); }
+    } catch(e) {
+      if (padEl) padEl.classList.remove('loading');
+    }
+  }
+}
+
+// ── DRUMS ──
+const DRUMS = [
+  { n:'Kick 1',   s:'D1', fn: (i)=>dKick(i) },
+  { n:'Clap 1',   s:'D2', fn: (i)=>dClap(i) },
+  { n:'Wood 1',   s:'D3', fn: (i)=>dWood(i) },
+  { n:'Tumb 1',   s:'D4', fn: (i)=>dTumb(i) },
+  { n:'Tom 1',    s:'D5', fn: (i)=>dTom(160,i) },
+  { n:'Tom 2',    s:'D6', fn: (i)=>dTom(240,i) },
+  { n:'Swell',    s:'D7', fn: (i)=>dSwell(i) },
+  { n:'EFX Perc', s:'D8', fn: (i)=>dFXTom(i) },
+];
+
+function dG(i) { return drumGains[i] || lpF; }
+
+function dKick(i=0){initCtx();const o=ctx.createOscillator(),e=ctx.createGain();o.frequency.setValueAtTime(160,ctx.currentTime);o.frequency.exponentialRampToValueAtTime(40,ctx.currentTime+0.15);e.gain.setValueAtTime(drumMV*drumVols[i]*0.95,ctx.currentTime);e.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.5);o.connect(e);e.connect(dG(i));o.start();o.stop(ctx.currentTime+0.55);}
+function dClap(i=1){initCtx();for(let k=0;k<3;k++){const b=ctx.createBuffer(1,ctx.sampleRate*0.05,ctx.sampleRate),d=b.getChannelData(0);for(let j=0;j<d.length;j++)d[j]=Math.random()*2-1;const s=ctx.createBufferSource(),e=ctx.createGain(),f=ctx.createBiquadFilter();f.type='bandpass';f.frequency.value=1200;f.Q.value=0.7;s.buffer=b;const t=ctx.currentTime+k*0.018;e.gain.setValueAtTime(drumMV*drumVols[i]*0.7,t);e.gain.exponentialRampToValueAtTime(0.001,t+0.12);s.connect(f);f.connect(e);e.connect(dG(i));s.start(t);}}
+function dWood(i=2){initCtx();const o=ctx.createOscillator(),e=ctx.createGain();o.type='square';o.frequency.setValueAtTime(820,ctx.currentTime);o.frequency.exponentialRampToValueAtTime(400,ctx.currentTime+0.05);e.gain.setValueAtTime(drumMV*drumVols[i]*0.55,ctx.currentTime);e.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.13);o.connect(e);e.connect(dG(i));o.start();o.stop(ctx.currentTime+0.16);}
+function dTumb(i=3){initCtx();const o=ctx.createOscillator(),e=ctx.createGain();o.frequency.setValueAtTime(260,ctx.currentTime);o.frequency.exponentialRampToValueAtTime(85,ctx.currentTime+0.1);e.gain.setValueAtTime(drumMV*drumVols[i]*0.85,ctx.currentTime);e.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.22);o.connect(e);e.connect(dG(i));o.start();o.stop(ctx.currentTime+0.26);}
+function dTom(fq,i=4){initCtx();const o=ctx.createOscillator(),e=ctx.createGain();o.frequency.setValueAtTime(fq,ctx.currentTime);o.frequency.exponentialRampToValueAtTime(fq*0.4,ctx.currentTime+0.3);e.gain.setValueAtTime(drumMV*drumVols[i]*0.75,ctx.currentTime);e.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.45);o.connect(e);e.connect(dG(i));o.start();o.stop(ctx.currentTime+0.5);}
+function dSwell(i=6){initCtx();const o=ctx.createOscillator(),e=ctx.createGain();o.type='sawtooth';o.frequency.value=82;e.gain.setValueAtTime(0.001,ctx.currentTime);e.gain.linearRampToValueAtTime(drumMV*drumVols[i]*0.55,ctx.currentTime+0.6);e.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+2.2);o.connect(e);e.connect(dG(i));o.start();o.stop(ctx.currentTime+2.3);}
+function dFXTom(i=7){initCtx();const o=ctx.createOscillator(),e=ctx.createGain();o.frequency.setValueAtTime(620,ctx.currentTime);o.frequency.exponentialRampToValueAtTime(78,ctx.currentTime+0.5);e.gain.setValueAtTime(drumMV*drumVols[i]*0.85,ctx.currentTime);e.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.62);o.connect(e);e.connect(dG(i));o.start();o.stop(ctx.currentTime+0.68);}
+
+// ══════════════════════════════════════
+// BUILD UI
+// ══════════════════════════════════════
+function buildNotes() {
+  const g = document.getElementById('ng');
+  NOTES.forEach(n => {
+    const b = document.createElement('button');
+    b.className = 'npad'; b.dataset.note = n; b.dataset.k = n + oct;
+    b.textContent = n;
+    b.addEventListener('click', () => { ripple(b); toggleNote(n, b); });
+    g.appendChild(b);
+  });
+}
+
+function buildDrums() {
+  const grid = document.getElementById('dg');
+  const vols = document.getElementById('dv');
+
+  DRUMS.forEach((d, i) => {
+    const pad = document.createElement('div');
+    pad.className = 'dpad';
+    pad.innerHTML = `<div class="dpad-gl"></div><div class="dpad-name">${d.n}</div><div class="dpad-sub">${d.s}</div>`;
+    pad.addEventListener('click', () => {
+      ripple(pad); initCtx(); d.fn(i);
+      pad.classList.add('hit'); setSt(d.n);
+      setTimeout(() => pad.classList.remove('hit'), 130);
+    });
+    grid.appendChild(pad);
+
+    const item = document.createElement('div');
+    item.className = 'dv-item';
+    const pid = 'dp'+i;
+    item.innerHTML = `
+      <div class="dv-name">${d.n}</div>
+      <div class="dv-sub">${d.s}</div>
+      <div class="dv-row">
+        <input class="cs" type="range" min="0" max="100" value="${Math.round(drumVols[i]*100)}" style="--p:${Math.round(drumVols[i]*100)}%" id="dsl${i}"
+               oninput="sp(this);drumVols[${i}]=this.value/100;if(drumGains[${i}])drumGains[${i}].gain.value=drumVols[${i}];document.getElementById('${pid}').textContent=this.value+'%';autoSave()">
+        <span class="dv-pct" id="${pid}">${Math.round(drumVols[i]*100)}%</span>
+      </div>`;
+    vols.appendChild(item);
+  });
+}
+
+function ripple(el) {
+  const r = document.createElement('span'); r.className = 'rpl';
+  const s = Math.max(el.offsetWidth, el.offsetHeight);
+  r.style.cssText = `width:${s}px;height:${s}px;left:${el.offsetWidth/2-s/2}px;top:${el.offsetHeight/2-s/2}px`;
+  el.appendChild(r); setTimeout(() => r.remove(), 500);
+}
+function sp(el) { el.style.setProperty('--p', el.value+'%'); }
+
+// ══════════════════════════════════════
+// CONTROLES
+// ══════════════════════════════════════
+function setOct(n) {
+  oct = n;
+  document.querySelectorAll('.ob').forEach(b => b.classList.toggle('a', +b.textContent === n));
+  document.querySelectorAll('.npad').forEach((b, i) => b.dataset.k = NOTES[i]+n);
+  autoSave();
+}
+
+let stT;
+function setSt(txt, keep=true) {
+  document.getElementById('stxt').textContent = txt.toUpperCase();
+  const d = document.getElementById('sd');
+  if (keep) {
+    d.classList.add('on');
+    clearTimeout(stT);
+    stT = setTimeout(() => { if (!Object.keys(activeN).length) { d.classList.remove('on'); document.getElementById('stxt').textContent='PARADO'; } }, 700);
+  } else d.classList.remove('on');
+}
+
+function CS(i, v) {
+  v = +v; initCtx();
+  const sv = document.getElementById('sv'+i);
+  if (i===0) { masterG.gain.value=v/100; sv.textContent=v+'%'; }
+  else if (i===1) { panN.pan.value=(v-50)/50; sv.textContent=v==50?'C':(v<50?'L'+(50-v):'R'+(v-50)); }
+  else if (i===2) { const hz=200+(v/100)*11800; lpF.frequency.value=hz; sv.textContent=hz>=1000?(hz/1000).toFixed(1)+'k':Math.round(hz)+'Hz'; }
+  else if (i===3) { const hz=20+(v/100)*1180; hpF.frequency.value=hz; sv.textContent=hz>=1000?(hz/1000).toFixed(1)+'k':Math.round(hz)+'Hz'; }
+  else if (i===4) { revG.gain.value=v/100; dryG.gain.value=1-v/100; sv.textContent=v+'%'; }
+}
+
+function openOv(id)  { document.getElementById(id+'Ov').classList.add('open'); }
+function closeOv(id) { document.getElementById(id+'Ov').classList.remove('open'); }
+
+function resetSettings() {
+  const defs = [80, 50, 70, 5, 25];
+  defs.forEach((v, i) => {
+    const sl = document.getElementById('cfg' + i);
+    if (sl) { sl.value = v; sp(sl); CS(i, v); }
+  });
+  showToast('RESTAURADO');
+}
+
+// METRO
+let bpm=120, comp=4, mRun=false, mInt=null, bIdx=0, metVol=0.7;
+
+function setBPM(v) {
+  bpm = Math.min(240, Math.max(40, v));
+  document.getElementById('bdisp').textContent = bpm;
+  document.getElementById('bsl').value = bpm;
+  document.getElementById('bsl').style.setProperty('--p', ((bpm-40)/200*100)+'%');
+  if (mRun) { stopMetro(); startMetro(); }
+}
+function chBPM(d) { setBPM(bpm+d); }
+function setComp(n, el) { comp=n; document.querySelectorAll('.cbtn').forEach(b=>b.classList.remove('a')); el.classList.add('a'); buildBeats(); bIdx=0; }
+function buildBeats() {
+  const r=document.getElementById('beatrow'); r.innerHTML='';
+  for(let i=0;i<comp;i++){const d=document.createElement('div');d.className='bdot'+(i===0?' str':'');r.appendChild(d);}
+}
+function tickBeat() {
+  const dots=document.querySelectorAll('.bdot');
+  dots.forEach(d=>d.classList.remove('on'));
+  if(dots[bIdx])dots[bIdx].classList.add('on');
+  playClick(bIdx===0);
+  const pend=document.getElementById('pend');
+  if(pend){const dir=(bIdx%2===0)?1:-1;const x2=24+dir*12;pend.setAttribute('x2',x2);pend.setAttribute('y2',32);const c=pend.nextElementSibling;if(c){c.setAttribute('cx',x2);c.setAttribute('cy',32);}}
+  bIdx=(bIdx+1)%comp;
+}
+function playClick(str){initCtx();const o=ctx.createOscillator(),g=ctx.createGain();o.frequency.value=str?1200:800;g.gain.setValueAtTime(metVol*(str?.6:.3),ctx.currentTime);g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.05);o.connect(g);g.connect(ctx.destination);o.start();o.stop(ctx.currentTime+0.06);}
+function startMetro(){tickBeat();mInt=setInterval(tickBeat,(60/bpm)*1000);}
+function stopMetro(){clearInterval(mInt);document.querySelectorAll('.bdot').forEach(d=>d.classList.remove('on'));bIdx=0;}
+function togMetro(){
+  initCtx();mRun=!mRun;
+  const btn=document.getElementById('mplaybtn'),hb=document.getElementById('mhb');
+  if(mRun){startMetro();btn.textContent='■  PARAR';btn.classList.add('run');hb.classList.add('on');}
+  else{stopMetro();btn.textContent='▶  INICIAR';btn.classList.remove('run');hb.classList.remove('on');}
+}
+
+function setTheme(n) {
+  document.body.className = n?'t-'+n:'';
+  document.querySelectorAll('.tc').forEach(c=>c.classList.remove('a'));
+  document.getElementById('t-'+n).classList.add('a');
+  autoSave();
+}
+
+const km={a:'C',w:'C#',s:'D',e:'D#',d:'E',f:'F',t:'F#',g:'G',y:'G#',h:'A',u:'A#',j:'B'};
+document.addEventListener('keydown', ev => {
+  if(ev.repeat||ev.ctrlKey||ev.metaKey)return;
+  const n=km[ev.key];
+  if(n){const b=document.querySelector(`.npad[data-note="${n}"]`);if(b){ripple(b);toggleNote(n,b);}}
+});
+
+// ══════════════════════════════════════
+// INIT
+// ══════════════════════════════════════
+buildNotes();
+buildDrums();
+buildBeats();
+loadSettings();
+loadSavedAudios();
+</script>
+<div class="toast" id="toast"></div>
+</body>
+</html>
