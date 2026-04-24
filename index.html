@@ -191,6 +191,25 @@ main{
   width:100%;
 }
 
+/* botão conectar rápido — só aparece no mobile */
+.mob-conn-btn{
+  display:none;
+}
+@media(max-width:600px){
+  .mob-conn-btn{
+    display:block;
+    grid-column:1/-1;
+    width:100%;box-sizing:border-box;
+    padding:14px;
+    background:var(--acc);color:#000;
+    font-family:'Space Mono',monospace;font-size:12px;letter-spacing:2px;font-weight:bold;
+    border:none;border-radius:14px;cursor:pointer;
+    transition:opacity .15s;
+  }
+  .mob-conn-btn:active{opacity:.7;}
+  .mob-conn-btn.hidden{display:none;}
+}
+
 /* ─── LEFT: NOTES ─── */
 .lcol{display:flex;flex-direction:column;gap:16px;height:100%;min-width:0;}
 
@@ -657,6 +676,8 @@ footer{
 
 <!-- MAIN -->
 <main>
+
+  <button id="mobConnectBtn" class="mob-conn-btn" onclick="quickConnect()">CONECTAR AO COMPUTADOR</button>
 
   <!-- LEFT -->
   <div class="lcol">
@@ -1452,6 +1473,12 @@ function _applyMetro(ev) {
   }
 }
 
+const QUICK_CODE = '0000';
+
+function quickConnect() {
+  connectAsRemote(QUICK_CODE);
+}
+
 // ── HOST MODE ──
 function openHostMode() {
   document.getElementById('hostOv').classList.add('open');
@@ -1459,8 +1486,8 @@ function openHostMode() {
 
 function closeHostOv() { document.getElementById('hostOv').classList.remove('open'); }
 
-function generateHostCode() {
-  const code = String(Math.floor(Math.random() * 9000) + 1000);
+function generateHostCode(fixedCode) {
+  const code = fixedCode || String(Math.floor(Math.random() * 9000) + 1000);
   document.getElementById('hostCodeDisplay').textContent = code;
   document.getElementById('hostSts').textContent = 'Aguardando celular...';
   document.getElementById('hostSts').className = 'host-sts';
@@ -1531,6 +1558,7 @@ function connectAsRemote(code) {
       document.getElementById('pinInput').disabled = true;
       document.getElementById('discBtn').style.display = 'block';
       document.getElementById('hostOv').classList.remove('open');
+      document.getElementById('mobConnectBtn').classList.add('hidden');
       showToast('CONECTADO!');
     });
     conn.on('data', ev => {
@@ -1587,6 +1615,7 @@ function exitRemoteMode() {
   document.getElementById('connBtn').textContent = 'CONECTAR';
   document.getElementById('connBtn').disabled = false;
   document.getElementById('discBtn').style.display = 'none';
+  document.getElementById('mobConnectBtn').classList.remove('hidden');
 }
 
 // iOS: redireciona toda saída do Web Audio para um <audio> HTML via MediaStream
@@ -1676,6 +1705,8 @@ loadSettings();
 prefetchPromise = prefetchAudios();
 loadingStarted = true;
 startLoading();
+// Desktop sempre escuta no código fixo — celular conecta com 1 toque
+generateHostCode(QUICK_CODE);
 
 </script>
 <div class="toast" id="toast"></div>
