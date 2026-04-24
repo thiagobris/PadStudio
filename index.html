@@ -459,24 +459,26 @@ footer{
   .ld-top{gap:14px;}
 
   /* Header: linha 1 = logo + botões | linha 2 = status + crossfade */
-  header{padding:12px 14px;gap:8px;}
+  header{padding:12px 16px;gap:8px;}
   .logo{order:1;flex:1;font-size:14px;letter-spacing:2px;}
   .hbtns{order:2;flex-shrink:0;gap:6px;}
-  .hctr{order:3;flex-basis:100%;flex:none;gap:8px;}
-  .hpill-status{min-width:0;flex-shrink:0;padding:10px 12px;}
-  .hctr .hpill:not(.hpill-status){flex:1;min-width:0;padding:12px 14px;border-radius:13px;}
+  .hctr{order:3;flex-basis:100%;flex:none;gap:8px;overflow:hidden;}
+  /* status pill: flexível, não mais largura fixa */
+  .hpill-status{width:auto;flex:1.4;min-width:0;padding:10px 12px;}
+  /* crossfade pill: compartilha espaço, não vaza */
+  .hctr .hpill:not(.hpill-status){flex:1;min-width:0;padding:10px 12px;border-radius:13px;overflow:hidden;}
   .hl{display:none;}
-  input.cf{flex:1;min-width:0;width:auto;height:6px;}
+  input.cf{flex:1;min-width:0;width:0;max-width:100%;height:6px;}
   input.cf::-webkit-slider-thumb{width:24px;height:24px;}
-  .hv{font-size:13px;min-width:26px;}
-  .stxt{font-size:11px;}
-  .stimer{font-size:11px;min-width:32px;}
-  .sd{width:9px;height:9px;}
-  .hb{width:48px;height:48px;border-radius:12px;}
-  .hb svg{width:21px;height:21px;}
+  .hv{font-size:13px;min-width:24px;flex-shrink:0;}
+  .stxt{font-size:11px;overflow:hidden;text-overflow:ellipsis;}
+  .stimer{font-size:11px;min-width:32px;flex-shrink:0;}
+  .sd{width:9px;height:9px;flex-shrink:0;}
+  .hb{width:44px;height:44px;border-radius:12px;}
+  .hb svg{width:20px;height:20px;}
 
   /* Conteúdo */
-  main{padding:16px 14px;gap:20px;}
+  main{padding:16px 16px;gap:20px;}
   .lcol{gap:16px;}
   .rcol{gap:16px;}
 
@@ -535,9 +537,11 @@ footer{
   .ld-logo{font-size:24px;}
   .npad{height:74px;font-size:15px;}
   .dpad{height:108px;}
-  .hb{width:46px;height:46px;}
-  .hpill-status{padding:9px 11px;}
-  .hctr .hpill{padding:11px 14px;}
+  .hb{width:42px;height:42px;}
+  header{padding:10px 14px;}
+  main{padding:14px 14px;}
+  .hpill-status{padding:9px 10px;}
+  .hctr .hpill:not(.hpill-status){padding:9px 10px;}
 }
 </style>
 </head>
