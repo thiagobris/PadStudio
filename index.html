@@ -118,8 +118,10 @@
 
 /* ─── RESET ─── */
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html{overflow-x:clip;max-width:100vw;overscroll-behavior-x:none;}
-body{background:var(--bg);color:var(--txt);font-family:'Syne',sans-serif;min-height:100vh;display:flex;flex-direction:column;transition:background .4s,color .4s;overflow-x:clip;width:100%;max-width:100vw;overscroll-behavior-x:none;}
+html,body{overflow-x:hidden;max-width:100%;overscroll-behavior-x:none;}
+body{background:var(--bg);color:var(--txt);font-family:'Syne',sans-serif;min-height:100vh;display:flex;flex-direction:column;transition:background .4s,color .4s;}
+/* Wrapper: fix real para overflow horizontal no iOS Safari */
+#app{width:100%;overflow-x:hidden;display:flex;flex-direction:column;min-height:100vh;}
 
 /* ─── HEADER ─── */
 header{
@@ -454,98 +456,94 @@ footer{
 @media(max-width:600px){
 
   /* Loader */
-  .ld-logo{font-size:28px;letter-spacing:3px;}
-  .ld-count{font-size:12px;}
+  .ld-logo{font-size:26px;letter-spacing:2px;}
+  .ld-count{font-size:11px;}
 
   /* ── Header ── */
-  header{padding:10px 14px;gap:6px;overflow:hidden;}
-  .logo{order:1;flex:1;font-size:13px;letter-spacing:2px;}
-  .hbtns{order:2;flex-shrink:0;gap:5px;}
-  .hb{width:40px;height:40px;border-radius:10px;}
-  .hb svg{width:18px;height:18px;}
+  header{padding:8px 12px;gap:6px;}
+  .logo{order:1;flex:1;font-size:12px;letter-spacing:2px;}
+  .hbtns{order:2;flex-shrink:0;gap:4px;}
+  .hb{width:36px;height:36px;border-radius:9px;}
+  .hb svg{width:16px;height:16px;}
 
-  /* Linha 2: status pill + crossfade pill */
-  .hctr{order:3;flex-basis:100%;flex:none;gap:6px;overflow:hidden;min-width:0;}
-
-  /* Status pill: tamanho natural, sem largura fixa */
-  .hpill-status{width:auto;flex:0 0 auto;min-width:0;max-width:55%;padding:8px 10px;gap:6px;}
-  .sd{width:8px;height:8px;flex-shrink:0;}
-  .stxt{font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:clip;max-width:60px;}
-  .stimer{font-size:10px;width:auto;min-width:28px;flex-shrink:0;}
-
-  /* Crossfade pill: ocupa o resto */
-  .hctr .hpill:not(.hpill-status){flex:1;min-width:0;padding:8px 10px;border-radius:11px;overflow:hidden;gap:6px;}
+  /* Linha 2 header */
+  .hctr{order:3;flex-basis:100%;flex:none;gap:6px;min-width:0;}
+  .hpill-status{width:auto;flex:1;min-width:0;padding:7px 10px;gap:5px;}
+  .sd{width:7px;height:7px;flex-shrink:0;}
+  .stxt{font-size:10px;white-space:nowrap;}
+  .stimer{font-size:10px;min-width:26px;flex-shrink:0;}
+  .hctr .hpill:not(.hpill-status){flex:1;min-width:0;padding:7px 10px;border-radius:10px;gap:5px;}
   .hl{display:none;}
-  input.cf{flex:1;width:0;min-width:0;height:5px;}
-  input.cf::-webkit-slider-thumb{width:20px;height:20px;}
-  .hv{font-size:11px;min-width:20px;flex-shrink:0;}
+  input.cf{flex:1;width:0;min-width:0;height:4px;}
+  input.cf::-webkit-slider-thumb{width:18px;height:18px;}
+  .hv{font-size:10px;min-width:18px;flex-shrink:0;}
 
   /* ── Main ── */
-  main{padding:14px 14px;gap:14px;}
-  .lcol{gap:12px;}
-  .rcol{gap:12px;}
+  main{padding:12px 12px;gap:12px;}
+  .lcol{gap:10px;}
+  .rcol{gap:10px;}
 
-  /* Note pads: 3 colunas, tamanho reduzido */
-  .ngrid{gap:7px;}
-  .npad{height:76px;font-size:16px;border-radius:13px;touch-action:manipulation;}
+  /* Note pads */
+  .ngrid{gap:6px;}
+  .npad{height:70px;font-size:15px;border-radius:12px;touch-action:manipulation;}
 
   /* Note info */
-  .ninfo{padding:14px 16px;border-radius:13px;gap:4px;}
-  .ni-lbl{font-size:10px;letter-spacing:1.5px;}
-  .ni-tom{font-size:28px;margin:3px 0 5px;}
-  .ni-kit{font-size:11px;}
+  .ninfo{padding:12px 14px;border-radius:12px;gap:3px;}
+  .ni-lbl{font-size:9px;letter-spacing:1.5px;}
+  .ni-tom{font-size:26px;margin:2px 0 4px;}
+  .ni-kit{font-size:10px;}
 
   /* Volume notas */
-  .nmvol{padding:14px 16px;border-radius:13px;}
-  .vol-lbl{font-size:11px;margin-bottom:10px;}
-  .vpct{font-size:12px;}
+  .nmvol{padding:12px 14px;border-radius:12px;}
+  .vol-lbl{font-size:10px;margin-bottom:10px;}
+  .vpct{font-size:11px;}
+  .vlbl{font-size:10px;}
 
-  /* Drum pads: 2 colunas */
-  .dgrid{grid-template-columns:repeat(2,1fr);gap:8px;}
-  .dpad{height:110px;padding:14px 14px;border-radius:13px;touch-action:manipulation;}
-  .dpad-name{font-size:15px;}
+  /* Drum pads */
+  .dgrid{grid-template-columns:repeat(2,1fr);gap:7px;}
+  .dpad{height:100px;padding:12px 12px;border-radius:12px;touch-action:manipulation;}
+  .dpad-name{font-size:14px;}
   .dpad-sub{font-size:10px;}
 
   /* Drum volumes */
-  .dvols{padding:14px 16px;gap:12px;border-radius:13px;}
-  .dv-grid{grid-template-columns:repeat(2,1fr);gap:12px 14px;}
-  .dv-master-row{padding-bottom:12px;}
+  .dvols{padding:12px 14px;gap:10px;border-radius:12px;}
+  .dv-grid{grid-template-columns:repeat(2,1fr);gap:10px 12px;}
+  .dv-master-row{padding-bottom:10px;}
   .dv-master-lbl{font-size:10px;width:auto;flex-shrink:1;}
-  .dv-name{font-size:11px;}
-  .dv-sub{font-size:9px;}
+  .dv-name{font-size:10px;}
+  .dv-sub{display:none;}
   .dv-pct{font-size:10px;}
 
-  /* Thumbs touch */
-  input.cs::-webkit-slider-thumb{width:26px;height:26px;}
-  input.cs::-moz-range-thumb{width:26px;height:26px;}
+  /* Sliders touch */
+  input.cs::-webkit-slider-thumb{width:24px;height:24px;}
+  input.cs::-moz-range-thumb{width:24px;height:24px;}
 
   /* Footer */
-  footer{padding:16px 14px;font-size:10px;}
+  footer{padding:14px 12px;font-size:9px;}
 
   /* Modais */
-  .panel{width:96%;padding:20px 18px 18px;border-radius:20px;max-height:88vh;}
-  .ptit{font-size:16px;}
-  .mbtn{padding:10px 16px;font-size:15px;}
-  .bpmnum{font-size:46px;}
-  .mplay{padding:13px;font-size:12px;}
-  .tgrid{gap:9px;}
-  .tc-thumb{height:66px;}
-  .tc-info{padding:10px 12px 11px;}
+  .panel{width:96%;padding:18px 16px 16px;border-radius:18px;max-height:88vh;}
+  .ptit{font-size:15px;}
+  .mbtn{padding:9px 14px;font-size:14px;}
+  .bpmnum{font-size:44px;}
+  .mplay{padding:12px;font-size:11px;}
+  .tgrid{gap:8px;}
+  .tc-thumb{height:62px;}
+  .tc-info{padding:9px 11px 10px;}
 }
 
-/* ── iPhone SE e telas ≤375px ── */
+/* ── iPhone SE ≤375px ── */
 @media(max-width:375px){
-  header{padding:8px 12px;}
-  main{padding:12px 12px;gap:12px;}
-  .hb{width:38px;height:38px;}
-  .npad{height:70px;font-size:15px;}
-  .dpad{height:100px;}
-  .hpill-status{max-width:50%;}
-  .stxt{max-width:52px;}
+  header{padding:7px 10px;}
+  main{padding:10px 10px;gap:10px;}
+  .hb{width:34px;height:34px;}
+  .npad{height:64px;font-size:14px;}
+  .dpad{height:90px;}
 }
 </style>
 </head>
 <body>
+<div id="app">
 
 <!-- LOADER -->
 <div id="loader">
@@ -642,6 +640,8 @@ footer{
 <footer>
   <span class="ft-logo">PAD<b>STUDIO</b></span> &copy; 2026 &mdash; Criado por Thiago Bris
 </footer>
+
+</div><!-- #app -->
 
 <!-- SETTINGS -->
 <div class="ov" id="cfgOv" onclick="closeOv('cfg')">
