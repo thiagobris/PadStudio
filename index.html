@@ -1247,15 +1247,28 @@ function setTheme(n) {
   autoSave();
 }
 
-// iOS: ignora chave de silencioso tocando áudio HTML (muda sessão de "ambient" para "playback")
+// iOS: muda sessão de áudio de "ambient" para "playback" tocando áudio real
+// (mesma categoria usada pelo YouTube — ignora a chave de silencioso)
 let iosSilentUnlocked = false;
+async function unlockIosSilent() {
+  if (iosSilentUnlocked) return;
+  iosSilentUnlocked = true;
+  // Usa um dos arquivos m4a já prefetchados como desbloqueador
+  const raw = prefetched['C'] || prefetched['A'] || Object.values(prefetched)[0];
+  if (!raw) return;
+  try {
+    const blob = new Blob([raw], { type: 'audio/mp4' });
+    const url = URL.createObjectURL(blob);
+    const a = new Audio(url);
+    a.setAttribute('playsinline', '');
+    a.volume = 0.001; // praticamente inaudível
+    await a.play().catch(() => {});
+    setTimeout(() => { a.pause(); URL.revokeObjectURL(url); }, 400);
+  } catch(e) {}
+}
+
 document.addEventListener('touchstart', async () => {
-  if (!iosSilentUnlocked) {
-    iosSilentUnlocked = true;
-    const a = new Audio();
-    a.src = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
-    a.play().catch(() => {});
-  }
+  await unlockIosSilent();
   if (ctx && ctx.state !== 'running') await ctx.resume();
 }, { passive: true });
 
