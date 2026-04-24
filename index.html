@@ -621,7 +621,7 @@ footer{
     <div class="hpill">
       <span class="hl">CROSSFADE</span>
       <input class="cf" id="cfsl" type="range" min="0" max="10" step="1" value="0"
-             oninput="cf=+this.value;document.getElementById('cfv').textContent=this.value+'s';autoSave()">
+             oninput="cf=+this.value;document.getElementById('cfv').textContent=this.value+'s';sendRemote({type:'param',k:'cf',v:cf});autoSave()">
       <span class="hv" id="cfv">0s</span>
     </div>
   </div>
@@ -682,7 +682,7 @@ footer{
       <div class="vol-lbl">VOLUME MASTER</div>
       <div class="vrow" style="margin-top:10px">
         <input class="cs" id="noteMasterSl" type="range" min="0" max="100" value="80" style="--p:80%"
-               oninput="sp(this);noteMV=this.value/100;if(noteMasterG)noteMasterG.gain.value=noteMV;document.getElementById('nmpct').textContent=this.value+'%';autoSave()">
+               oninput="sp(this);noteMV=this.value/100;if(noteMasterG)noteMasterG.gain.value=noteMV;document.getElementById('nmpct').textContent=this.value+'%';sendRemote({type:'param',k:'noteMV',v:noteMV});autoSave()">
         <span class="vpct" id="nmpct">80%</span>
       </div>
     </div>
@@ -697,7 +697,7 @@ footer{
       <div class="dv-master-row">
         <span class="dv-master-lbl">VOLUME — BATERIA</span>
         <input class="cs" id="drumMasterSl" type="range" min="0" max="100" value="80" style="--p:80%;flex:1"
-               oninput="sp(this);drumMV=this.value/100;document.getElementById('dmpct').textContent=this.value+'%';autoSave()">
+               oninput="sp(this);drumMV=this.value/100;document.getElementById('dmpct').textContent=this.value+'%';sendRemote({type:'param',k:'drumMV',v:drumMV});autoSave()">
         <span class="dv-master-pct" id="dmpct">80%</span>
       </div>
       <!-- individual drum vols -->
@@ -884,7 +884,7 @@ let _peerConn = null;
 let _reconnTimer = null;
 
 function sendRemote(data) {
-  if (_peerConn && _peerConn.open) _peerConn.send(data);
+  if (isRemoteMode && _peerConn && _peerConn.open) _peerConn.send(data);
 }
 
 // ══════════════════════════════════════
@@ -1273,7 +1273,7 @@ function buildDrums() {
       <div class="dv-sub">${d.s}</div>
       <div class="dv-row">
         <input class="cs" type="range" min="0" max="100" value="${Math.round(drumVols[i]*100)}" style="--p:${Math.round(drumVols[i]*100)}%" id="dsl${i}"
-               oninput="sp(this);drumVols[${i}]=this.value/100;if(drumGains[${i}])drumGains[${i}].gain.value=drumVols[${i}];document.getElementById('${pid}').textContent=this.value+'%';autoSave()">
+               oninput="sp(this);drumVols[${i}]=this.value/100;if(drumGains[${i}])drumGains[${i}].gain.value=drumVols[${i}];document.getElementById('${pid}').textContent=this.value+'%';sendRemote({type:'param',k:'drumVol',i:${i},v:drumVols[${i}]});autoSave()">
         <span class="dv-pct" id="${pid}">${Math.round(drumVols[i]*100)}%</span>
       </div>`;
     vols.appendChild(item);
@@ -1295,6 +1295,7 @@ function setOct(n) {
   oct = n;
   document.querySelectorAll('.ob').forEach(b => b.classList.toggle('a', +b.textContent === n));
   document.querySelectorAll('.npad').forEach((b, i) => b.dataset.k = NOTES[i]+n);
+  sendRemote({type:'param',k:'oct',v:n});
   autoSave();
 }
 
@@ -1310,13 +1311,22 @@ function setSt(txt, keep=true) {
 }
 
 function CS(i, v) {
-  v = +v; initCtx();
+  v = +v;
   const sv = document.getElementById('sv'+i);
-  if (i===0) { masterG.gain.value=v/100; sv.textContent=v+'%'; }
-  else if (i===1) { panN.pan.value=(v-50)/50; sv.textContent=v==50?'C':(v<50?'L'+(50-v):'R'+(v-50)); }
-  else if (i===2) { const hz=200+(v/100)*11800; lpF.frequency.value=hz; sv.textContent=hz>=1000?(hz/1000).toFixed(1)+'k':Math.round(hz)+'Hz'; }
-  else if (i===3) { const hz=20+(v/100)*1180; hpF.frequency.value=hz; sv.textContent=hz>=1000?(hz/1000).toFixed(1)+'k':Math.round(hz)+'Hz'; }
-  else if (i===4) { revG.gain.value=v/100; dryG.gain.value=1-v/100; sv.textContent=v+'%'; }
+  if (!isRemoteMode) {
+    initCtx();
+    if (i===0) masterG.gain.value=v/100;
+    else if (i===1) panN.pan.value=(v-50)/50;
+    else if (i===2) { const hz=200+(v/100)*11800; lpF.frequency.value=hz; }
+    else if (i===3) { const hz=20+(v/100)*1180; hpF.frequency.value=hz; }
+    else if (i===4) { revG.gain.value=v/100; dryG.gain.value=1-v/100; }
+  }
+  if (i===0) sv.textContent=v+'%';
+  else if (i===1) sv.textContent=v==50?'C':(v<50?'L'+(50-v):'R'+(v-50));
+  else if (i===2) { const hz=200+(v/100)*11800; sv.textContent=hz>=1000?(hz/1000).toFixed(1)+'k':Math.round(hz)+'Hz'; }
+  else if (i===3) { const hz=20+(v/100)*1180; sv.textContent=hz>=1000?(hz/1000).toFixed(1)+'k':Math.round(hz)+'Hz'; }
+  else if (i===4) sv.textContent=v+'%';
+  sendRemote({type:'param',k:'cfg',i,v});
 }
 
 function openOv(id)  { document.getElementById(id+'Ov').classList.add('open'); }
@@ -1339,7 +1349,8 @@ function setBPM(v) {
   document.getElementById('bdisp').textContent = bpm;
   document.getElementById('bsl').value = bpm;
   document.getElementById('bsl').style.setProperty('--p', ((bpm-40)/200*100)+'%');
-  if (mRun) { stopMetro(); startMetro(); }
+  sendRemote({type:'metro',action:'bpm',v:bpm});
+  if (!isRemoteMode && mRun) { stopMetro(); startMetro(); }
 }
 function chBPM(d) { setBPM(bpm+d); }
 function setComp(n, el) { comp=n; document.querySelectorAll('.cbtn').forEach(b=>b.classList.remove('a')); el.classList.add('a'); buildBeats(); bIdx=0; }
@@ -1360,10 +1371,16 @@ function playClick(str){initCtx();const o=ctx.createOscillator(),g=ctx.createGai
 function startMetro(){tickBeat();mInt=setInterval(tickBeat,(60/bpm)*1000);}
 function stopMetro(){clearInterval(mInt);document.querySelectorAll('.bdot').forEach(d=>d.classList.remove('on'));bIdx=0;}
 function togMetro(){
-  initCtx();mRun=!mRun;
+  mRun=!mRun;
   const btn=document.getElementById('mplaybtn'),hb=document.getElementById('mhb');
-  if(mRun){startMetro();btn.textContent='■  PARAR';btn.classList.add('run');hb.classList.add('on');}
-  else{stopMetro();btn.textContent='▶  INICIAR';btn.classList.remove('run');hb.classList.remove('on');}
+  if(mRun){
+    if(!isRemoteMode){initCtx();startMetro();}
+    btn.textContent='■  PARAR';btn.classList.add('run');hb.classList.add('on');
+  } else {
+    if(!isRemoteMode)stopMetro();
+    btn.textContent='▶  INICIAR';btn.classList.remove('run');hb.classList.remove('on');
+  }
+  sendRemote({type:'metro',action:'toggle',v:mRun});
 }
 
 function setTheme(n) {
@@ -1373,6 +1390,49 @@ function setTheme(n) {
   autoSave();
 }
 
+// ── APPLY REMOTE PARAMS (host side) ──
+function _applyParam(ev) {
+  const k = ev.k;
+  if (k === 'noteMV') {
+    noteMV = ev.v;
+    const sl = document.getElementById('noteMasterSl');
+    if (sl) { sl.value = Math.round(ev.v*100); sp(sl); }
+    document.getElementById('nmpct').textContent = Math.round(ev.v*100)+'%';
+    if (noteMasterG) noteMasterG.gain.value = noteMV;
+  } else if (k === 'drumMV') {
+    drumMV = ev.v;
+    const sl = document.getElementById('drumMasterSl');
+    if (sl) { sl.value = Math.round(ev.v*100); sp(sl); }
+    document.getElementById('dmpct').textContent = Math.round(ev.v*100)+'%';
+  } else if (k === 'cf') {
+    cf = ev.v;
+    const sl = document.getElementById('cfsl');
+    if (sl) sl.value = ev.v;
+    document.getElementById('cfv').textContent = ev.v+'s';
+  } else if (k === 'cfg') {
+    const sl = document.getElementById('cfg'+ev.i);
+    if (sl) { sl.value = ev.v; sp(sl); }
+    CS(ev.i, ev.v);
+  } else if (k === 'drumVol') {
+    drumVols[ev.i] = ev.v;
+    const sl = document.getElementById('dsl'+ev.i);
+    const pct = document.getElementById('dp'+ev.i);
+    if (sl) { sl.value = Math.round(ev.v*100); sp(sl); }
+    if (pct) pct.textContent = Math.round(ev.v*100)+'%';
+    if (drumGains[ev.i]) drumGains[ev.i].gain.value = ev.v;
+  } else if (k === 'oct') {
+    setOct(ev.v);
+  }
+}
+
+function _applyMetro(ev) {
+  if (ev.action === 'toggle') {
+    if (mRun !== ev.v) togMetro();
+  } else if (ev.action === 'bpm') {
+    setBPM(ev.v);
+  }
+}
+
 // ── HOST MODE ──
 function openHostMode() {
   document.getElementById('hostOv').classList.add('open');
@@ -1380,8 +1440,9 @@ function openHostMode() {
 
 function closeHostOv() { document.getElementById('hostOv').classList.remove('open'); }
 
-function generateHostCode() {
-  const code = String(Math.floor(Math.random() * 9000) + 1000);
+function generateHostCode(savedCode) {
+  const code = savedCode || String(Math.floor(Math.random() * 9000) + 1000);
+  localStorage.setItem('ps_host_code', code);
   document.getElementById('hostCodeDisplay').textContent = code;
   document.getElementById('hostSts').textContent = 'Aguardando celular...';
   document.getElementById('hostSts').className = 'host-sts';
@@ -1409,6 +1470,11 @@ function generateHostCode() {
         if (p) { ripple(p); p.classList.add('hit'); setTimeout(() => p.classList.remove('hit'), 130); }
         initCtx(); if (ctx.state !== 'running') ctx.resume();
         DRUMS[ev.i].fn(ev.i);
+      } else if (ev.type === 'param') {
+        _applyParam(ev);
+      } else if (ev.type === 'metro') {
+        initCtx(); if (ctx.state !== 'running') ctx.resume();
+        _applyMetro(ev);
       }
     });
     conn.on('close', () => {
@@ -1438,6 +1504,7 @@ function connectAsRemote(code) {
     _peerConn = conn;
     conn.on('open', () => {
       isRemoteMode = true;
+      localStorage.setItem('ps_remote_code', code);
       document.getElementById('remoteBanner').style.display = 'flex';
       const s = document.getElementById('rbStatus');
       s.textContent = 'CONECTADO'; s.classList.add('live');
@@ -1471,6 +1538,7 @@ function connectAsRemote(code) {
 function exitRemoteMode() {
   isRemoteMode = false;
   _remoteCode = null;
+  localStorage.removeItem('ps_remote_code');
   clearTimeout(_reconnTimer);
   if (_peerConn) { try { _peerConn.close(); } catch(e){} _peerConn = null; }
   if (_myPeer) { try { _myPeer.destroy(); } catch(e){} _myPeer = null; }
@@ -1562,6 +1630,18 @@ loadSettings();
 prefetchPromise = prefetchAudios();
 loadingStarted = true;
 startLoading();
+
+// Auto-restore peer connection from previous session
+(function() {
+  const remCode = localStorage.getItem('ps_remote_code');
+  const hostCode = localStorage.getItem('ps_host_code');
+  if (remCode) {
+    document.getElementById('pinInput').value = remCode;
+    setTimeout(() => connectAsRemote(remCode), 1500);
+  } else if (hostCode) {
+    generateHostCode(hostCode);
+  }
+})();
 </script>
 <div class="toast" id="toast"></div>
 </body>
