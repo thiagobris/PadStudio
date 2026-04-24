@@ -206,21 +206,8 @@ main{
 }
 .npad:hover{background:var(--sur-h);}
 .npad.on{
-  background:var(--non-bg);border-color:var(--non-bor);
-  color:var(--non-col);box-shadow:0 0 18px var(--non-gl);
-}
-.npad.on::after{
-  content:'';position:absolute;bottom:5px;left:50%;transform:translateX(-50%);
-  width:5px;height:5px;border-radius:50%;
-  background:var(--non-bor);box-shadow:0 0 6px var(--non-bor);
-}
-.npad.loaded{
-  border-color:rgba(255,255,255,0.22);
-}
-.npad.loaded::before{
-  content:'';position:absolute;top:5px;right:5px;
-  width:5px;height:5px;border-radius:50%;
-  background:var(--acc2);opacity:0.7;
+  background:var(--acc);border-color:var(--acc);
+  color:#000;box-shadow:0 0 22px var(--non-gl);
 }
 .npad.loading{
   opacity:0.55;
