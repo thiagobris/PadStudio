@@ -133,7 +133,7 @@ header{
 .logo{font-family:'Space Mono',monospace;font-size:16px;font-weight:700;letter-spacing:3px;color:var(--acc);flex-shrink:0;}
 .logo b{color:var(--txt);}
 
-.hctr{display:flex;align-items:center;gap:12px;flex:1;justify-content:center;flex-wrap:wrap;}
+.hpill-cf{flex:1;max-width:320px;}
 
 /* unified pill style */
 .hpill{
@@ -418,6 +418,19 @@ input.cs::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:v
 .tc-name{font-size:13px;font-weight:800;letter-spacing:.4px;}
 .tc-desc{font-size:9px;color:var(--txt2);margin-top:3px;letter-spacing:.4px;}
 
+/* ─── FOOTER ─── */
+footer{
+  border-top:1px solid var(--bor);
+  padding:28px 24px;
+  text-align:center;
+  font-family:'Space Mono',monospace;
+  font-size:10px;letter-spacing:1.5px;
+  color:var(--txt2);
+  transition:border-color .4s,color .4s;
+}
+.ft-logo{color:var(--acc);font-weight:700;letter-spacing:3px;}
+.ft-logo b{color:var(--txt);}
+
 /* ─── LOADER ─── */
 #loader{
   position:fixed;inset:0;z-index:600;
@@ -443,56 +456,57 @@ input.cs::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:v
 
 /* ─── RESPONSIVE ─── */
 @media(max-width:720px){
-  main{grid-template-columns:1fr;padding:16px 14px;gap:14px;}
+  main{grid-template-columns:1fr;padding:20px 16px;gap:20px;}
   .dv-grid{grid-template-columns:repeat(2,1fr);}
 }
 
 @media(max-width:600px){
   html,body{overflow-x:hidden;}
 
-  /* ── Header: linha 1 = logo + botões | linha 2 = pills ── */
+  /* ── Header: linha 1 = logo + status + botões | linha 2 = crossfade ── */
   header{padding:12px 16px;gap:8px;}
   .logo{order:1;flex:1;font-size:14px;letter-spacing:2px;}
-  .hbtns{order:2;flex-shrink:0;gap:6px;}
-  .hb{width:48px;height:48px;border-radius:12px;}
-  .hb svg{width:22px;height:22px;}
-  .hctr{order:3;flex-basis:100%;gap:8px;}
-  .hpill{flex:1;padding:10px 13px;border-radius:13px;min-width:0;}
-  .hpill-status{width:auto;}
+  .hpill-status{order:2;width:auto;flex-shrink:0;padding:9px 12px;}
+  .hbtns{order:3;flex-shrink:0;gap:6px;}
+  .hpill-cf{order:4;flex-basis:100%;max-width:100%;padding:11px 16px;border-radius:13px;}
+  .hpill{padding:9px 12px;}
   .hl{font-size:10px;letter-spacing:0.8px;}
-  .hv{font-size:12px;min-width:20px;}
+  .hv{font-size:12px;min-width:24px;}
   .stxt{font-size:11px;}
   .sd{width:9px;height:9px;}
-  input.cf{flex:1;min-width:0;width:auto;}
+  input.cf{flex:1;min-width:0;width:auto;height:6px;}
+  input.cf::-webkit-slider-thumb{width:22px;height:22px;}
+  .hb{width:48px;height:48px;border-radius:12px;}
+  .hb svg{width:22px;height:22px;}
 
   /* ── Conteúdo ── */
-  main{padding:12px 12px;gap:12px;}
-  .lcol{gap:12px;}
-  .rcol{gap:12px;}
+  main{padding:16px 14px;gap:20px;}
+  .lcol{gap:14px;}
+  .rcol{gap:14px;}
 
   /* ── Note pads ── */
-  .ngrid{gap:7px;}
+  .ngrid{gap:8px;}
   .npad{height:76px;font-size:16px;border-radius:14px;touch-action:manipulation;}
 
   /* ── Note info ── */
-  .ninfo{padding:13px 15px;border-radius:14px;}
+  .ninfo{padding:14px 16px;border-radius:14px;}
   .ni-lbl{font-size:10px;}
   .ni-tom{font-size:28px;margin:3px 0 5px;}
   .ni-kit{font-size:12px;}
 
   /* ── Volume notas ── */
-  .nmvol{padding:14px 16px;border-radius:14px;}
+  .nmvol{padding:16px 18px;border-radius:14px;}
   .vol-lbl{font-size:11px;letter-spacing:1px;margin-bottom:12px;}
 
-  /* ── Drum pads ── */
-  .dgrid{grid-template-columns:repeat(4,1fr);gap:7px;}
-  .dpad{height:84px;padding:10px 10px;border-radius:13px;touch-action:manipulation;}
-  .dpad-name{font-size:12px;}
-  .dpad-sub{font-size:9px;}
+  /* ── Drum pads: 2 colunas, mais largos ── */
+  .dgrid{grid-template-columns:repeat(2,1fr);gap:10px;}
+  .dpad{height:110px;padding:14px 16px;border-radius:14px;touch-action:manipulation;}
+  .dpad-name{font-size:15px;}
+  .dpad-sub{font-size:10px;}
 
   /* ── Drum volumes ── */
-  .dvols{padding:14px 16px;gap:12px;border-radius:14px;}
-  .dv-grid{grid-template-columns:repeat(2,1fr);gap:12px 14px;}
+  .dvols{padding:16px 18px;gap:14px;border-radius:14px;}
+  .dv-grid{grid-template-columns:repeat(2,1fr);gap:14px 16px;}
   .dv-master-row{padding-bottom:12px;}
   .dv-master-lbl{font-size:10px;letter-spacing:1px;width:auto;flex-shrink:1;}
   .dv-name{font-size:11px;}
@@ -502,6 +516,9 @@ input.cs::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:v
   /* ── Thumbs maiores para toque ── */
   input.cs::-webkit-slider-thumb{width:26px;height:26px;}
   input.cs::-moz-range-thumb{width:26px;height:26px;}
+
+  /* ── Footer ── */
+  footer{padding:20px 16px;font-size:9px;letter-spacing:1px;}
 
   /* ── Panels / modais ── */
   .panel{width:96%;padding:20px 18px 18px;border-radius:20px;max-height:88vh;}
@@ -533,20 +550,10 @@ input.cs::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:v
 <header>
   <div class="logo">PAD<b>STUDIO</b></div>
 
-  <div class="hctr">
-    <!-- CROSSFADE -->
-    <div class="hpill">
-      <span class="hl">CROSSFADE</span>
-      <input class="cf" id="cfsl" type="range" min="0" max="10" step="1" value="0"
-             oninput="cf=+this.value;document.getElementById('cfv').textContent=this.value+'s';autoSave()">
-      <span class="hv" id="cfv">0s</span>
-    </div>
-
-    <!-- STATUS -->
-    <div class="hpill hpill-status">
-      <div class="sd" id="sd"></div>
-      <span class="stxt" id="stxt">PARADO</span>
-    </div>
+  <!-- STATUS — linha 1 junto ao logo -->
+  <div class="hpill hpill-status">
+    <div class="sd" id="sd"></div>
+    <span class="stxt" id="stxt">PARADO</span>
   </div>
 
   <div class="hbtns">
@@ -570,6 +577,14 @@ input.cs::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:v
         <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.7"/>
       </svg>
     </div>
+  </div>
+
+  <!-- CROSSFADE — linha própria no mobile, inline no desktop -->
+  <div class="hpill hpill-cf">
+    <span class="hl">CROSSFADE</span>
+    <input class="cf" id="cfsl" type="range" min="0" max="10" step="1" value="0"
+           oninput="cf=+this.value;document.getElementById('cfv').textContent=this.value+'s';autoSave()">
+    <span class="hv" id="cfv">0s</span>
   </div>
 </header>
 
@@ -614,6 +629,10 @@ input.cs::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:v
   </div>
 
 </main>
+
+<footer>
+  <span class="ft-logo">PAD<b>STUDIO</b></span> &copy; 2026 &mdash; Criado por Thiago Bris
+</footer>
 
 <!-- SETTINGS -->
 <div class="ov" id="cfgOv" onclick="closeOv('cfg')">
