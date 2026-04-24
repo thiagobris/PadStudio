@@ -1464,22 +1464,27 @@ function generateHostCode(savedCode) {
     document.getElementById('hostSts').classList.add('ok');
     document.getElementById('hostChip').style.display = 'flex';
     document.getElementById('hostHb').classList.add('on');
-    conn.on('data', ev => {
+    // aquece o contexto de áudio assim que o celular conecta
+    initCtx(); if (ctx && ctx.state !== 'running') ctx.resume().catch(() => {});
+    conn.on('data', async ev => {
       if (ev.type === 'note') {
         const el = document.querySelector('.npad[data-note="' + ev.name + '"]');
         if (el) ripple(el);
-        initCtx(); if (ctx.state !== 'running') ctx.resume();
+        initCtx();
+        if (ctx.state !== 'running') await ctx.resume();
         toggleNote(ev.name, el);
       } else if (ev.type === 'drum') {
         const pads = document.querySelectorAll('.dpad');
         const p = pads[ev.i];
         if (p) { ripple(p); p.classList.add('hit'); setTimeout(() => p.classList.remove('hit'), 130); }
-        initCtx(); if (ctx.state !== 'running') ctx.resume();
+        initCtx();
+        if (ctx.state !== 'running') await ctx.resume();
         DRUMS[ev.i].fn(ev.i);
       } else if (ev.type === 'param') {
         _applyParam(ev);
       } else if (ev.type === 'metro') {
-        initCtx(); if (ctx.state !== 'running') ctx.resume();
+        initCtx();
+        if (ctx.state !== 'running') await ctx.resume();
         _applyMetro(ev);
       }
     });
