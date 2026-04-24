@@ -1247,27 +1247,40 @@ function setTheme(n) {
   autoSave();
 }
 
-// iOS: muda sessão de áudio de "ambient" para "playback" tocando áudio real
-// (mesma categoria usada pelo YouTube — ignora a chave de silencioso)
+// iOS: redireciona toda saída do Web Audio para um <audio> HTML via MediaStream
+// Isso força a sessão AVAudioSession para "playback" — ignora a chave de silencioso
 let iosSilentUnlocked = false;
+let mediaStreamEl = null;
+
 async function unlockIosSilent() {
-  if (iosSilentUnlocked) return;
+  if (iosSilentUnlocked || !ctx) return;
   iosSilentUnlocked = true;
-  // Usa um dos arquivos m4a já prefetchados como desbloqueador
-  const raw = prefetched['C'] || prefetched['A'] || Object.values(prefetched)[0];
-  if (!raw) return;
   try {
-    const blob = new Blob([raw], { type: 'audio/mp4' });
-    const url = URL.createObjectURL(blob);
-    const a = new Audio(url);
-    a.setAttribute('playsinline', '');
-    a.volume = 0.001; // praticamente inaudível
-    await a.play().catch(() => {});
-    setTimeout(() => { a.pause(); URL.revokeObjectURL(url); }, 400);
-  } catch(e) {}
+    const streamDest = ctx.createMediaStreamDestination();
+    panN.disconnect();         // desconecta de ctx.destination
+    panN.connect(streamDest);  // redireciona para o stream
+
+    const el = document.createElement('audio');
+    el.setAttribute('playsinline', '');
+    el.setAttribute('webkit-playsinline', '');
+    el.srcObject = streamDest.stream;
+    el.volume = 1;
+    document.body.appendChild(el);
+
+    await el.play().catch(() => {
+      // fallback: se MediaStream não funcionar, reconecta ao destino normal
+      panN.disconnect();
+      panN.connect(ctx.destination);
+    });
+    mediaStreamEl = el;
+  } catch(e) {
+    // fallback
+    try { panN.disconnect(); panN.connect(ctx.destination); } catch(_) {}
+  }
 }
 
 document.addEventListener('touchstart', async () => {
+  initCtx();
   await unlockIosSilent();
   if (ctx && ctx.state !== 'running') await ctx.resume();
 }, { passive: true });
