@@ -540,6 +540,48 @@ footer{
   .npad{height:64px;font-size:14px;}
   .dpad{height:90px;}
 }
+
+/* ─── REMOTE CONTROL ─── */
+.remote-row{
+  order:10;flex-basis:100%;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  border-top:1px solid var(--bor);padding-top:8px;margin-top:2px;
+  font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1.5px;
+  color:var(--non-col);
+}
+.rb-dot{width:7px;height:7px;border-radius:50%;background:currentColor;flex-shrink:0;animation:blink .9s infinite;}
+.rb-sep{color:var(--txt2);}
+#rbStatus{color:var(--txt2);}
+#rbStatus.live{color:var(--acc2);}
+
+/* HOST OVERLAY */
+.host-qr-wrap{
+  background:#fff;border-radius:14px;padding:14px;
+  margin:16px auto;width:fit-content;display:block;
+}
+.host-qr-img{width:200px;height:200px;display:block;border-radius:6px;background:var(--slbg);}
+.host-url-box{
+  background:var(--sur);border:1px solid var(--bor);border-radius:12px;
+  padding:12px 14px;margin-top:12px;cursor:pointer;
+  font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.5px;
+  word-break:break-all;color:var(--acc);text-align:left;
+  transition:background .15s;
+}
+.host-url-box:hover{background:var(--sur-h);}
+.host-url-lbl{font-size:9px;letter-spacing:2px;color:var(--txt2);display:block;margin-bottom:6px;}
+.host-sts{
+  font-family:'Space Mono',monospace;font-size:11px;letter-spacing:1.5px;
+  color:var(--txt2);text-align:center;margin:8px 0 4px;
+}
+.host-sts.ok{color:var(--acc2);}
+.host-chip{
+  display:none;align-items:center;justify-content:center;gap:8px;
+  background:rgba(71,255,178,0.09);border:1px solid var(--acc2);
+  border-radius:12px;padding:10px 16px;margin-top:14px;
+  font-family:'Space Mono',monospace;font-size:11px;letter-spacing:1px;color:var(--acc2);
+}
+.host-chip-dot{width:8px;height:8px;border-radius:50%;background:var(--acc2);box-shadow:0 0 8px var(--acc2);}
+.is-remote .hb-host{display:none;}
 </style>
 </head>
 <body>
@@ -572,6 +614,12 @@ footer{
   </div>
 
   <div class="hbtns">
+    <div class="hb hb-host" id="hostHb" title="Controle Remoto" onclick="openHostMode()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
     <div class="hb" id="mhb" title="Metrônomo" onclick="openOv('metro')">
       <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M10 2L18 19H2L10 2Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
@@ -592,6 +640,14 @@ footer{
         <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.7"/>
       </svg>
     </div>
+  </div>
+
+  <!-- remote mode indicator (hidden unless ?r= param) -->
+  <div id="remoteBanner" class="remote-row" style="display:none">
+    <div class="rb-dot"></div>
+    <span>MODO REMOTO</span>
+    <span class="rb-sep">—</span>
+    <span id="rbStatus">Conectando...</span>
   </div>
 </header>
 
@@ -642,6 +698,28 @@ footer{
 </footer>
 
 </div><!-- #app -->
+
+<!-- HOST MODE -->
+<div class="ov" id="hostOv" onclick="closeHostOv()">
+ <div class="panel" onclick="event.stopPropagation()">
+  <div class="phd">
+   <span class="ptit">Controle Remoto</span>
+   <div class="phd-actions"><div class="pcls" onclick="closeHostOv()">✕</div></div>
+  </div>
+  <p class="host-sts" id="hostSts">Gerando código...</p>
+  <div class="host-qr-wrap">
+   <img id="hostQr" class="host-qr-img" src="" alt="QR Code">
+  </div>
+  <div class="host-url-box" onclick="copyHostUrl()" title="Toque para copiar">
+   <span class="host-url-lbl">ABRA NO CELULAR — toque para copiar</span>
+   <span id="hostUrlTxt"></span>
+  </div>
+  <div class="host-chip" id="hostChip">
+   <div class="host-chip-dot"></div>
+   <span>Celular conectado — som saindo aqui</span>
+  </div>
+ </div>
+</div>
 
 <!-- SETTINGS -->
 <div class="ov" id="cfgOv" onclick="closeOv('cfg')">
@@ -773,7 +851,22 @@ footer{
  </div>
 </div>
 
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script>
+// ══════════════════════════════════════
+// PEER / REMOTE CONTROL
+// ══════════════════════════════════════
+const _rParam = new URLSearchParams(location.search).get('r');
+const isRemoteMode = !!_rParam;
+let _myPeer = null;
+let _peerConn = null;
+
+function sendRemote(data) {
+  if (_peerConn && _peerConn.open) _peerConn.send(data);
+}
+
+if (isRemoteMode) document.body.classList.add('is-remote');
+
 // ══════════════════════════════════════
 // INDEXEDDB — armazena AudioBuffers
 // ══════════════════════════════════════
@@ -1123,7 +1216,11 @@ function buildNotes() {
     const b = document.createElement('button');
     b.className = 'npad'; b.dataset.note = n; b.dataset.k = n + oct;
     b.textContent = n;
-    b.addEventListener('click', async () => { ripple(b); initCtx(); if (ctx.state !== 'running') await ctx.resume(); toggleNote(n, b); });
+    b.addEventListener('click', async () => {
+      ripple(b);
+      if (isRemoteMode) { sendRemote({type:'note', name: n}); return; }
+      initCtx(); if (ctx.state !== 'running') await ctx.resume(); toggleNote(n, b);
+    });
     g.appendChild(b);
   });
 }
@@ -1137,9 +1234,14 @@ function buildDrums() {
     pad.className = 'dpad';
     pad.innerHTML = `<div class="dpad-gl"></div><div class="dpad-name">${d.n}</div><div class="dpad-sub">${d.s}</div>`;
     pad.addEventListener('click', async () => {
-      ripple(pad); initCtx(); if (ctx.state !== 'running') await ctx.resume(); d.fn(i);
-      pad.classList.add('hit');
-      setTimeout(() => pad.classList.remove('hit'), 130);
+      ripple(pad);
+      if (isRemoteMode) {
+        sendRemote({type:'drum', i});
+        pad.classList.add('hit'); setTimeout(() => pad.classList.remove('hit'), 130);
+        return;
+      }
+      initCtx(); if (ctx.state !== 'running') await ctx.resume(); d.fn(i);
+      pad.classList.add('hit'); setTimeout(() => pad.classList.remove('hit'), 130);
     });
     grid.appendChild(pad);
 
@@ -1251,6 +1353,87 @@ function setTheme(n) {
   autoSave();
 }
 
+// ── HOST MODE ──
+function openHostMode() {
+  document.getElementById('hostOv').classList.add('open');
+  if (_myPeer && !_myPeer.destroyed) return; // já inicializado
+  document.getElementById('hostSts').textContent = 'Gerando código...';
+  document.getElementById('hostSts').className = 'host-sts';
+  document.getElementById('hostQr').src = '';
+  document.getElementById('hostUrlTxt').textContent = '';
+  document.getElementById('hostChip').style.display = 'none';
+
+  _myPeer = new Peer();
+  _myPeer.on('open', id => {
+    const url = location.origin + location.pathname + '?r=' + id;
+    document.getElementById('hostQr').src =
+      'https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=' + encodeURIComponent(url) + '&bgcolor=ffffff&color=000000&margin=1';
+    document.getElementById('hostUrlTxt').textContent = url;
+    document.getElementById('hostSts').textContent = 'Aguardando celular...';
+  });
+  _myPeer.on('connection', conn => {
+    _peerConn = conn;
+    document.getElementById('hostSts').textContent = 'Celular conectado!';
+    document.getElementById('hostSts').classList.add('ok');
+    document.getElementById('hostChip').style.display = 'flex';
+    document.getElementById('hostHb').classList.add('on');
+    conn.on('data', ev => {
+      if (ev.type === 'note') {
+        const el = document.querySelector('.npad[data-note="' + ev.name + '"]');
+        if (el) ripple(el);
+        initCtx(); if (ctx.state !== 'running') ctx.resume();
+        toggleNote(ev.name, el);
+      } else if (ev.type === 'drum') {
+        const pads = document.querySelectorAll('.dpad');
+        const p = pads[ev.i];
+        if (p) { ripple(p); p.classList.add('hit'); setTimeout(() => p.classList.remove('hit'), 130); }
+        initCtx(); if (ctx.state !== 'running') ctx.resume();
+        DRUMS[ev.i].fn(ev.i);
+      }
+    });
+    conn.on('close', () => {
+      document.getElementById('hostSts').textContent = 'Celular desconectado';
+      document.getElementById('hostSts').classList.remove('ok');
+      document.getElementById('hostChip').style.display = 'none';
+      document.getElementById('hostHb').classList.remove('on');
+      _peerConn = null;
+    });
+  });
+  _myPeer.on('error', err => {
+    document.getElementById('hostSts').textContent = 'Erro: ' + err.type;
+  });
+}
+
+function closeHostOv() { document.getElementById('hostOv').classList.remove('open'); }
+
+function copyHostUrl() {
+  const url = document.getElementById('hostUrlTxt').textContent;
+  if (url) { navigator.clipboard.writeText(url).then(() => showToast('URL COPIADA')).catch(() => {}); }
+}
+
+// ── REMOTE MODE ──
+function initRemoteMode() {
+  document.getElementById('remoteBanner').style.display = 'flex';
+  const p = new Peer();
+  p.on('open', () => {
+    const conn = p.connect(_rParam, {reliable: true});
+    _peerConn = conn;
+    conn.on('open', () => {
+      const s = document.getElementById('rbStatus');
+      if (s) { s.textContent = 'CONECTADO'; s.classList.add('live'); }
+    });
+    conn.on('close', () => {
+      const s = document.getElementById('rbStatus');
+      if (s) { s.textContent = 'DESCONECTADO'; s.classList.remove('live'); }
+      _peerConn = null;
+    });
+  });
+  p.on('error', () => {
+    const s = document.getElementById('rbStatus');
+    if (s) s.textContent = 'ERRO DE CONEXÃO';
+  });
+}
+
 // iOS: redireciona toda saída do Web Audio para um <audio> HTML via MediaStream
 // Isso força a sessão AVAudioSession para "playback" — ignora a chave de silencioso
 let iosSilentUnlocked = false;
@@ -1284,6 +1467,7 @@ async function unlockIosSilent() {
 }
 
 document.addEventListener('touchstart', async () => {
+  if (isRemoteMode) return;
   initCtx();
   await unlockIosSilent();
   if (ctx && ctx.state !== 'running') await ctx.resume();
@@ -1310,12 +1494,14 @@ function dismissLoader() {
 }
 
 async function startLoading() {
+  if (isRemoteMode) {
+    await new Promise(r => setTimeout(r, 400));
+    dismissLoader();
+    return;
+  }
   try { initCtx(); } catch(e) {}
-  // Aguarda apenas o download/leitura do IndexedDB (rápido no reload)
   await prefetchPromise;
-  // Mostra o site imediatamente
   dismissLoader();
-  // Decodifica em background — pads funcionam com oscilador até ficarem prontos
   decodeAudiosInBackground();
 }
 
@@ -1331,10 +1517,10 @@ buildNotes();
 buildDrums();
 buildBeats();
 loadSettings();
-prefetchPromise = prefetchAudios();
-// Auto-start: decodifica assim que os arquivos estiverem prontos (sem esperar clique)
+prefetchPromise = isRemoteMode ? Promise.resolve() : prefetchAudios();
 loadingStarted = true;
 startLoading();
+if (isRemoteMode) initRemoteMode();
 </script>
 <div class="toast" id="toast"></div>
 </body>
